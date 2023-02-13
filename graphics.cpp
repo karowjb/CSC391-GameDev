@@ -2,6 +2,7 @@
 #include <SDL2/SDL.h>
 #include <stdexcept>
 #include <iostream>
+#include <string>
 
 Graphics::Graphics(const std::string &title, int window_width, int window_height)
     : width{window_width}, height{window_height}{
@@ -10,7 +11,7 @@ Graphics::Graphics(const std::string &title, int window_width, int window_height
     if (result < 0){
         std::cout << SDL_GetError() << '\n';
     }
-    window = SDL_CreateWindow("title", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height,0);
+    window = SDL_CreateWindow(title.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height,0);
     if(!window){
         std::cout << SDL_GetError() << '\n';
     }

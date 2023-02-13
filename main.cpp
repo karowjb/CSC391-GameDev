@@ -8,10 +8,14 @@ int main() {
     Graphics graphics{"game", 1280, 720};
     
     // objects
-    Player player{600, 300, 64};
+    Player player{{600, 300}, {64, 64}};
     
     World world;
-    world.add_platform(320, 500, 512, 64);
+    world.add_platform(0, 656, 1280, 64);
+    world.add_platform(200, 450, 400, 64);
+    world.add_platform(600, 200, 250, 64);
+    world.add_platform(0, 0, 64, 720);
+    world.add_platform(1216, 0, 64, 720);
     
     bool running{true};
     while (running) {
@@ -28,7 +32,8 @@ int main() {
         }
 
         // move the player in the world
-        player.update(world);
+        constexpr double dt = 1.0/30.0;
+        player.update(world, dt);
 
         // draw the player and platforms
         graphics.clear();

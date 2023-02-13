@@ -1,46 +1,102 @@
 #include "player.h"
 #include "world.h"
 
-Player::Player(int x, int y, int size)
-    :bounding_box{x, y, size, size}, vx{0}, vy{0} {}
+constexpr double terminal_velocity = 300;
+constexpr double walk_acceleration = 100;
+constexpr double jump_velocity = 100;
+constexpr double gravity = 50;
+constexpr double damping = 0.9;
+
+Player::Player(const Vec<double>& position, const Vec<int>& size)
+    :position{position}, size{size} {
+        acceleration.y = gravity;
+    }
 
 void Player::handle_input(const SDL_Event& event) {
-    // change the player's velocity based on the keypress
-    // make sure to set it to zero if no buttons are pressed
-    if (event.type == SDL_KEYDOWN){ // Key arrow events
+    if (event.type == SDL_KEYDOWN){
         SDL_Keycode key = event.key.keysym.sym;
-
-        // Make a copy to move and test collisions 
-        if (key == SDLK_DOWN){
-            vy += 10;
+        if (key == SDLK_RIGHT){
+            acceleration.x = walk_acceleration;
         }
-        else if (key == SDLK_UP){
-            vy-=10;
+        else if(key == SDLK_LEFT){
+            acceleration.x = -walk_acceleration;
         }
-        else if (key == SDLK_LEFT){
-            vx -= 10;
+        else if(key == SDLK_SPACE){
+            velocity.y = -jump_velocity;
+            acceleration.y = gravity;
         }
-        else if (key == SDLK_RIGHT){
-            vx += 10;
-        }
+        // else if(key == SDLK_UP){
+        //     acceleration.y = -walk_acceleration;
+        // }
+        // else if(key == SDLK_DOWN){
+        //     acceleration.y = +walk_acceleration;
+        // }
+        
     }
+    if (event.type == SDL_KEYUP){
+        SDL_Keycode key = event.key.keysym.sym;
+        if (key == SDLK_RIGHT){
+            acceleration.x = 0;
+        }
+        else if(key == SDLK_LEFT){
+            acceleration.x = 0;
+        }
+        // else if(key == SDLK_UP){
+        //     acceleration.y = 0;
+        // }
+        // else if(key == SDLK_DOWN){
+        //     acceleration.y = 0;
+        // }
+    }
+    
 }
 
-void Player::update(World& world) {
-    // predict the player's future position: make copy of bounding box, move it
-    // test for a collision and conditionally move the player's position
-    // you can optionally set the velocity back to zero
-    SDL_Rect future = bounding_box;
-    future.x += vx;
-    future.y += vy;
-    if(!world.has_any_intersections(future)){
-        bounding_box.x = future.x;
-        bounding_box.y = future.y;
+void Player::update(World& world, double dt){
+    // make copy of physics compoents 
+    Vec<double> vel = velocity;
+    Vec<double> acc = acceleration;
+    Vec<double> pos = position;
+
+
+    // semi implicit euler
+    vel += acc * dt;
+    vel.x *= damping;
+    // keep velocity under terminal 
+    vel.x = std::clamp(vel.x, -terminal_velocity, terminal_velocity);
+    vel.y = std::clamp(vel.y, -terminal_velocity, terminal_velocity);
+
+    pos += vel * dt;
+
+    // test x intersections first
+    SDL_Rect future{static_cast<int>(pos.x),static_cast<int>(position.y), size.x, size.y};
+    if (world.has_any_intersections(future)){
+        // collided  => stop velocity and acceleration
+        velocity.x = 0;
+        acceleration.x = 0;
     }
-    vx = 0;
-    vy = 0;
+    else {
+        position.x = pos.x;
+        acceleration.x = acc.x;
+        velocity.x = vel.x;
+    }
+    // test y 
+    future.x = static_cast<int>(position.x);
+    future.y = static_cast<int>(pos.y);
+    if (world.has_any_intersections(future)){
+        velocity.y = 0;
+        acceleration.y = 0;
+    }
+    else{
+        acceleration.y = acc.y;
+        velocity.y = vel.y;
+        position.y = pos.y;
+    }
+
 }
 
 std::pair<SDL_Rect, Color> Player::get_sprite() const {
-    return {bounding_box, {255, 0, 0, 255}};
+    int x = static_cast<int>(position.x);
+    int y = static_cast<int>(position.y);
+    SDL_Rect bounding_box{x,y,size.x, size.y};
+    return {bounding_box, {255,0,0,255}};
 }
