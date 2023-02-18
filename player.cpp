@@ -1,9 +1,9 @@
 #include "player.h"
 #include "world.h"
 
-constexpr double terminal_velocity = 500;
-constexpr double walk_acceleration = 480;
-constexpr double jump_velocity = 150;
+constexpr double terminal_velocity = 600;
+constexpr double walk_acceleration = 325;
+constexpr double jump_velocity = 175;
 constexpr double gravity = 50;
 constexpr double damping = 0.9;
 
