@@ -2,6 +2,7 @@
 
 #include <SDL2/SDL.h>
 #include <vector>
+#include "tilemap.h"
 
 class World {
 public:
