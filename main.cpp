@@ -4,6 +4,7 @@
 #include "camera.h"
 #include <SDL2/SDL.h>
 #include <iostream>
+#include <chrono>
 
 int main() {
     Graphics graphics{"game", 1280, 720};
@@ -30,7 +31,15 @@ int main() {
 
     bool running{true};
     bool grid_on{false};
+    auto previous = std::chrono::high_resolution_clock::now();
+    double lag{0.0};
     while (running) {
+        auto current = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<double> elapsed = current - previous;
+        previous = current;
+        lag += elapsed.count();
+
+        // Input
         SDL_Event event;
         while (SDL_PollEvent(&event)) {
             // handle windows and systems events first
@@ -45,11 +54,15 @@ int main() {
             // react to keypresses by moving
             player.handle_input(event);
         }
+        // Update
 
-        // move the player in the world
-        constexpr double dt = 1.0/30.0;
-        player.update(world, dt);
+        constexpr double dt = 1.0/60.0;
+        while (lag >= dt){
+            player.update(world, dt);
+            lag -= dt;
+        }
         // camera.update(dt);
+        //camera.moveTo()
 
         // draw the player and platforms
         graphics.clear();
