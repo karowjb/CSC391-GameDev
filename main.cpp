@@ -59,11 +59,15 @@ int main() {
         constexpr double dt = 1.0/60.0;
         while (lag >= dt){
             player.update(world, dt);
+            Vec<double> position = player.get_sprite().first;
+            // Update camera based on player y position being greater than half the world's height
+            if (position.y < world.tilemap.height/2){
+                position.y = world.tilemap.height/2;
+            }
+            camera.move_to(position);
             lag -= dt;
         }
-        // camera.update(dt);
-        //camera.moveTo()
-
+        
         // draw the player and platforms
         graphics.clear();
         camera.render(world.tilemap,grid_on);
