@@ -18,6 +18,7 @@ public:
 private:
     Graphics& graphics;
     int tilesize;
+    Vec<double> velocity{0};
     Vec<double> location; // Camera position in world coordinates
     void calculate_visible_tiles();
     Vec<int> visible_min, visible_max;
