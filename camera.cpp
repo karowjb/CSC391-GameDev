@@ -71,7 +71,7 @@ void Camera::render(const Tilemap& tilemap, bool grid_on) const {
     // tmp.x *= damping;
     // tmp.y *= damping;
     move_to(tmp);
- }
+}
 
 void Camera::calculate_visible_tiles() {
     // number of tiles visible (plus one for the edges)

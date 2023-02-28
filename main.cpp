@@ -69,6 +69,7 @@ int main() {
             lag -= dt;
         }
         
+        
         // draw the player and platforms
         graphics.clear();
         camera.render(world.tilemap,grid_on);
