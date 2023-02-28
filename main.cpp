@@ -17,7 +17,7 @@ int main() {
     world.add_platform(0,0,30,1);
     world.add_platform(0,0,1,10);
     world.add_platform(30,0,1,10);
-    world.add_platform(0,10,30,1);
+    world.add_platform(0,10,31,1);
 
     //Platforms
     world.add_platform(3,7,4,1);
@@ -59,13 +59,14 @@ int main() {
         constexpr double dt = 1.0/60.0;
         while (lag >= dt){
             player.update(world, dt);
+            camera.move_to(player.get_sprite().first);
+            // Vec<double> position = player.get_sprite().first;
+            // // Update camera based on player y position being greater than half the world's height
+            // if (position.y < world.tilemap.height/2){
+            //     position.y = world.tilemap.height/2;
+            // }
+            // camera.move_to(position);
             camera.update(dt);
-            Vec<double> position = player.get_sprite().first;
-            // Update camera based on player y position being greater than half the world's height
-            if (position.y < world.tilemap.height/2){
-                position.y = world.tilemap.height/2;
-            }
-            camera.move_to(position);
             lag -= dt;
         }
         

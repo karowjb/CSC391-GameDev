@@ -4,15 +4,18 @@
 #include "vec.h"
 #include <iostream>
 
-
+constexpr double acceleration = 2;
+constexpr double middlePoint = 5;
 Camera::Camera(Graphics& graphics, int tilesize)
     : graphics{graphics}, tilesize{tilesize} {
     calculate_visible_tiles();
 }
 
 void Camera::move_to(const Vec<double>& new_location) {
-    location = new_location;
-    calculate_visible_tiles();
+    velocity = (new_location - location) * acceleration;
+    // location = new_location;
+
+    // calculate_visible_tiles();
 }
 
 Vec<int> Camera::world_to_screen(const Vec<double>& world_position) const {
@@ -61,16 +64,26 @@ void Camera::render(const Tilemap& tilemap, bool grid_on) const {
     }
 }
  void Camera::update(double dt){
-    Vec<double> tmp = location;
-    tmp.x += dt;
-    // if (tmp.y < static_cast<double>(visible_max.y)){
-    //     tmp.y = static_cast<double>(visible_max.y)/2;
+    location += velocity * dt;
+     if (location.y < middlePoint){
+        location.y = middlePoint;
+    }
+    // else if (location.y < 5){
+    //     location.y = ;
     // }
-    // tmp.y = static_cast<double>(visible_max.y)/2;
-    // tmp.x = static_cast<double>(visible_max.x)/2;
-    // tmp.x *= damping;
-    // tmp.y *= damping;
-    move_to(tmp);
+    // if (static_cast<double>(visible_max.y)/2 > location.y){
+    //     location.y = static_cast<double>(visible_max.y)/2;
+    // }
+    // else if (static_cast<double>(visible_max.y)/2 < location.y){
+    //     location.y = 5;
+    // }
+    // else if(location.y < visible_max.y/2){
+    //     location.y = 3;
+    // }
+    calculate_visible_tiles();
+    // else {
+    //     location.y = static_cast<double>(visible_max.y/4);
+    // }
 }
 
 void Camera::calculate_visible_tiles() {
