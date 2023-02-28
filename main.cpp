@@ -59,6 +59,7 @@ int main() {
         constexpr double dt = 1.0/60.0;
         while (lag >= dt){
             player.update(world, dt);
+            camera.update(dt);
             Vec<double> position = player.get_sprite().first;
             // Update camera based on player y position being greater than half the world's height
             if (position.y < world.tilemap.height/2){

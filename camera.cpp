@@ -1,8 +1,9 @@
 #include "camera.h"
-
 #include "graphics.h"
 #include "tilemap.h"
 #include "vec.h"
+#include <iostream>
+
 
 Camera::Camera(Graphics& graphics, int tilesize)
     : graphics{graphics}, tilesize{tilesize} {
@@ -59,6 +60,18 @@ void Camera::render(const Tilemap& tilemap, bool grid_on) const {
         }
     }
 }
+ void Camera::update(double dt){
+    Vec<double> tmp = location;
+    tmp.x += dt;
+    // if (tmp.y < static_cast<double>(visible_max.y)){
+    //     tmp.y = static_cast<double>(visible_max.y)/2;
+    // }
+    // tmp.y = static_cast<double>(visible_max.y)/2;
+    // tmp.x = static_cast<double>(visible_max.x)/2;
+    // tmp.x *= damping;
+    // tmp.y *= damping;
+    move_to(tmp);
+ }
 
 void Camera::calculate_visible_tiles() {
     // number of tiles visible (plus one for the edges)
