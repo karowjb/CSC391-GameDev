@@ -2,7 +2,10 @@
 
 #include "graphics.h"
 #include <SDL2/SDL.h>
+#include "physics.h"
 #include <vec.h>
+#include <memory>
+#include "fsm.h"
 
 // forward declaration
 class World;
@@ -13,11 +16,11 @@ public:
     void handle_input(const SDL_Event& event);
     void update(World& world, double dt);
     std::pair<Vec<double>, Color> get_sprite() const;
-    
-private:
-    Vec<double> position;
+    Physics physics;
     Vec<int> size;
-    Vec<double> velocity, acceleration;
-    // SDL_Rect bounding_box;
-    // int vx, vy;
+    Color color{255,0,0,255};
+    const double walk_acceleration = 30;
+    const double jump_velocity = 7.5;
+    std::unique_ptr<State>state;
+
 };
