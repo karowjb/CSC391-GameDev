@@ -3,7 +3,7 @@
 void Physics::update(double dt){
    //update physics, semi-implicit euler
     velocity += acceleration * dt;
-    velocity.x *= damping;
+    // velocity.x *= damping;
 
     // keep velocity under terminal 
     velocity.x = std::clamp(velocity.x, -terminal_velocity, terminal_velocity);

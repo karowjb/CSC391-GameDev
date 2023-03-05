@@ -5,32 +5,16 @@
 Player::Player(const Vec<double>& position, const Vec<int>& size)
     :size{size} {
         physics.position = position;
+        state = std::make_unique<Standing>();
+        state->enter(*this);
     }
 
 void Player::handle_input(const SDL_Event& event) {
-    //state->handle_input
-    if (event.type == SDL_KEYDOWN){
-        SDL_Keycode key = event.key.keysym.sym;
-        if (key == SDLK_RIGHT){
-            // acceleration.x = walk_acceleration;
-        }
-        else if(key == SDLK_LEFT){
-            // acceleration.x = -walk_acceleration;
-        }
-        else if(key == SDLK_SPACE){
-            // velocity.y = jump_velocity;
-            // acceleration.y = gravity;
-        }
-        
-    }
-    if (event.type == SDL_KEYUP){
-        SDL_Keycode key = event.key.keysym.sym;
-        if (key == SDLK_RIGHT){
-            // acceleration.x = 0;
-        }
-        else if(key == SDLK_LEFT){
-            // acceleration.x = 0;
-        }
+    auto new_state = state->handle_input(*this, event);
+    if (new_state){
+        state->exit(*this);
+        state = std::move(new_state);
+        state->enter(*this);
     }
     
 }
