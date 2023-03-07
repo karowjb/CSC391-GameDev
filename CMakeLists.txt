@@ -14,6 +14,7 @@ add_library(gamelib
   camera.cpp
   physics.cpp
   fsm.cpp
+  command.cpp
 )
 
 target_include_directories(gamelib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${SDL2_INCLUDE_DIRS})

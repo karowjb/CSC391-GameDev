@@ -59,8 +59,9 @@ std::unique_ptr<State> Standing::update(Player& player, World& world, double dt)
 }
 
 void Standing::enter(Player& player){
-    player.color = {255,0,0,255};
-    player.physics.velocity.y = 0;
+    player.next_command = std::unique_ptr<Stop>();
+    // player.color = {255,0,0,255};
+    // player.physics.velocity.y = 0;
 }
 
 
@@ -135,7 +136,7 @@ std::unique_ptr<State> Running::update(Player& player, World& world, double dt){
     State::update(player,world,dt);
 
     player.physics.velocity.x *= damping; // Physics::damp()
-    std::cout << player.physics.velocity.x << "\n";
+    // std::cout << player.physics.velocity.x << "\n";
 
     if (player.physics.velocity.x == 0){
         return std::make_unique<Standing>();
