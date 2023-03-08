@@ -12,6 +12,9 @@ add_library(gamelib
   world.cpp
   tilemap.cpp
   camera.cpp
+  physics.cpp
+  fsm.cpp
+  command.cpp
 )
 
 target_include_directories(gamelib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${SDL2_INCLUDE_DIRS})
@@ -19,4 +22,3 @@ target_link_libraries(gamelib PUBLIC SDL2::SDL2)
 
 add_executable(main main.cpp)
 target_link_libraries(main PUBLIC gamelib)
-

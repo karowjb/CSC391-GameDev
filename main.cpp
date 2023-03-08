@@ -52,7 +52,10 @@ int main() {
             }
             // pass the rest of the events to the player who will
             // react to keypresses by moving
-            player.handle_input(event);
+            auto command = player.handle_input(event);
+            if (command){
+                command->execute(player, world);
+            }
         }
         // Update
 
