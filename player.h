@@ -19,8 +19,8 @@ public:
     Physics physics;
     Vec<int> size;
     Color color{255,0,0,255};
-    const double walk_acceleration = 5.0;
-    const double jump_velocity = 10.0;
+    const double walk_acceleration = 15.0;
+    const double jump_velocity = 9;
     std::unique_ptr<State>state;
 
 };

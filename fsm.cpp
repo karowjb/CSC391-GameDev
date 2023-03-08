@@ -31,17 +31,19 @@ std::unique_ptr<State> State::update(Player& player, World& world, double dt){
 // Standing
 //////////
 
-std::unique_ptr<State> Standing::handle_input(Player&, const SDL_Event& event) {
+std::unique_ptr<State> Standing::handle_input(Player& player, const SDL_Event& event) {
     if (event.type == SDL_KEYDOWN){
         SDL_Keycode key = event.key.keysym.sym;
         if (key == SDLK_SPACE || key == SDLK_UP){
             return std::make_unique<Jumping>();
         }
         if (key == SDLK_RIGHT || key == SDLK_d){
-            return std::make_unique<Running>();
+            return std::make_unique<Running>(player.walk_acceleration);
+            // return std::make_unique<Running>();
         }
         if (key == SDLK_LEFT || key == SDLK_a){
-            return std::make_unique<Running>();
+            return std::make_unique<Running>(-player.walk_acceleration);
+            // return std::make_unique<Running>();
         }
         if (key == SDLK_x){
             return std::make_unique<Shooting>();
@@ -77,10 +79,10 @@ std::unique_ptr<State> Jumping::handle_input(Player& player, const SDL_Event& ev
             player.physics.velocity.y += (gravity*2);
         }
         else if (key == SDLK_LEFT){
-            player.physics.velocity.x = -2.5;
+            player.physics.velocity.x = -3;
         }
          else if (key == SDLK_RIGHT){
-            player.physics.velocity.x = 2.5;
+            player.physics.velocity.x = 3;
         }
     }
     // reduced movement in left / right directions
@@ -105,28 +107,26 @@ void Jumping::enter(Player& player){
 // Running
 //////////
 
+Running::Running(double acceleration)
+:acceleration{acceleration}{}
+
 std::unique_ptr<State> Running::handle_input(Player& player, const SDL_Event& event) {
     if (event.type == SDL_KEYDOWN){
         SDL_Keycode key = event.key.keysym.sym;
-        if (key == SDLK_LEFT || key == SDLK_a){
-            // player.walk_acceleration = -player.walk_acceleration;
-            player.physics.velocity.x += -(player.walk_acceleration);
-        }
-        else if(key == SDLK_RIGHT || key == SDLK_d){
-            player.physics.velocity.x += player.walk_acceleration;
-        }
-        else if (key == SDLK_SPACE || key == SDLK_UP){
+        if (key == SDLK_SPACE || key == SDLK_UP){
+            player.physics.acceleration.x = 0;
             return std::make_unique<Jumping>();
         }
         else if (key == SDLK_x){
             return std::make_unique<Shooting>();
         }
         else if (key == SDLK_c){
-            return std::make_unique<Sliding>();
+            return std::make_unique<Sliding>(player.physics.acceleration.x);
         }
     }
     else if (event.type == SDL_KEYUP){
         player.physics.acceleration.x = 0;
+        return std::make_unique<Standing>();
     }
     return nullptr;
 }
@@ -135,7 +135,6 @@ std::unique_ptr<State> Running::update(Player& player, World& world, double dt){
     State::update(player,world,dt);
 
     player.physics.velocity.x *= damping; // Physics::damp()
-    std::cout << player.physics.velocity.x << "\n";
 
     if (player.physics.velocity.x == 0){
         return std::make_unique<Standing>();
@@ -143,14 +142,12 @@ std::unique_ptr<State> Running::update(Player& player, World& world, double dt){
     if (player.physics.velocity.x > terminal_velocity){
         player.physics.velocity.x = terminal_velocity;
     }
-    
     return nullptr;
 }
 
 void Running::enter(Player& player){
     player.color = {255,0,255,255};
-    player.physics.velocity.x = player.walk_acceleration;
-    // player.physics.velocity.x = player.walk_acceleration;
+    player.physics.acceleration.x += acceleration;
 }
 
 
@@ -162,18 +159,20 @@ std::unique_ptr<State> Shooting::handle_input(Player& player, const SDL_Event& e
     if (event.type == SDL_KEYDOWN){
         SDL_Keycode key = event.key.keysym.sym;
         if (key == SDLK_SPACE || key == SDLK_UP){
+            player.physics.velocity.x = 0;
             return std::make_unique<Jumping>();
         }
         if (key == SDLK_RIGHT || key == SDLK_d){
-            return std::make_unique<Running>();
+            return std::make_unique<Running>(player.walk_acceleration);
         }
         if (key == SDLK_LEFT || key == SDLK_a){
-            return std::make_unique<Running>();
+            return std::make_unique<Running>(-player.walk_acceleration);
         }
         if (key == SDLK_x){
             return std::make_unique<Shooting>();
         }
     }
+    
     return nullptr;
 }
 
@@ -183,31 +182,43 @@ std::unique_ptr<State> Shooting::update(Player& player, World& world, double dt)
 }
 void Shooting::enter(Player& player){
     player.color = {255,255,0,255};
-    player.physics.acceleration.x += -0.10;
 }
 //////////
 // Sliding 
 //////////
+Sliding::Sliding(double speed)
+    :slideSpeed{speed}{}
 
 std::unique_ptr<State> Sliding::handle_input(Player& player, const SDL_Event& event) {
     if (event.type == SDL_KEYDOWN){
         SDL_Keycode key = event.key.keysym.sym;
         if (key == SDLK_SPACE || key == SDLK_UP){
+            player.physics.velocity.x = 0;
             return std::make_unique<Jumping>();
         }
         if (key == SDLK_x){
             return std::make_unique<Shooting>();
         }
     }
+    else if (event.type == SDL_KEYUP){
+        player.physics.acceleration.x = 0;
+        return std::make_unique<Standing>();
+    }
     return nullptr;
 }
 void Sliding::enter(Player& player){
     player.color = {0,155,255,255};
-    // player.physics.velocity.y = player.jump_velocity;
+
+    if (player.physics.velocity.x < 0){
+        player.physics.acceleration.x -= -slideSpeed;
+    } else if (player.physics.velocity.x > 0){
+        player.physics.acceleration.x += slideSpeed;
+    }
 }
 
 std::unique_ptr<State> Sliding::update(Player& player, World& world, double dt){
     State::update(player,world,dt);
+    player.physics.velocity.x *= damping;
     return nullptr;
 }
 

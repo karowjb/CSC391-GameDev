@@ -1,8 +1,8 @@
 #pragma once
 #include "vec.h"
 
-constexpr double terminal_velocity = 30;
-constexpr double gravity = -10;
+constexpr double terminal_velocity = 15;
+constexpr double gravity = -9;
 constexpr double damping = 0.95;
 
 class Physics {
