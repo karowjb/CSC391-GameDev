@@ -27,30 +27,38 @@ public:
 
 class Jumping : public State {
 public:
+    Jumping(double velocity);
     std::unique_ptr<State> handle_input(Player& player, const SDL_Event& event) override;
     virtual std::unique_ptr<State> update(Player& player, World& world, double dt) override;
 
     void enter(Player& player) override;
-
+    void exit(Player& player) override;
+private:
+    double velocity;
 };
 
 class Running : public State {
 public:
+    Running(double acceleration);
     std::unique_ptr<State> handle_input(Player& player, const SDL_Event& event) override;
     virtual std::unique_ptr<State> update(Player& player, World& world, double dt) override;
-
     void enter(Player& player) override;
+    void exit(Player& player) override;
+private:
+    double acceleration;
 };
 
 class Sliding : public State {
 public:
+    Sliding(double speed);
     std::unique_ptr<State> handle_input(Player& player, const SDL_Event& event) override;
     virtual std::unique_ptr<State> update(Player& player, World& world, double dt) override;
-
     void enter(Player& player) override;
+    void exit(Player& player) override;
+private:
+    double speed;
 
 };
-
 
 class Shooting : public State {
 public:
@@ -59,4 +67,14 @@ public:
 
     void enter(Player& player) override;
 
+};
+
+class Falling : public State {
+public:
+    Falling(double speed);
+    std::unique_ptr<State> handle_input(Player& player, const SDL_Event& event) override;
+    virtual std::unique_ptr<State> update(Player& player, World& world, double dt) override;
+    void enter(Player& player) override;
+private:
+    double speed;
 };
