@@ -22,8 +22,8 @@ std::unique_ptr<Command> Player::handle_input(const SDL_Event& event) {
     
 }
 
-void Player::update(World& world, double dt){
-    auto new_state = state->update(*this, world, dt);
+void Player::update(Engine& engine, double dt){
+    auto new_state = state->update(*this, engine, dt);
     if (new_state){
         state->exit(*this);
         state = std::move(new_state);
@@ -31,7 +31,7 @@ void Player::update(World& world, double dt){
     }
 
     if (next_command){
-        next_command->execute(*this, world);
+        next_command->execute(*this, engine);
         next_command = nullptr;
     }
 }

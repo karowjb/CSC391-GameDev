@@ -15,6 +15,8 @@ add_library(gamelib
   physics.cpp
   fsm.cpp
   command.cpp
+  engine.cpp
+  settings.cpp
 )
 
 target_include_directories(gamelib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${SDL2_INCLUDE_DIRS})

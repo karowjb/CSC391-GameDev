@@ -7,18 +7,18 @@
 //State
 ///////////
 
-std::unique_ptr<State> State::update(Player& player, World& world, double dt){
+std::unique_ptr<State> State::update(Player& player, Engine& engine, double dt){
     Physics old = player.physics;
     player.physics.update(dt);
   
     // attempt to move x first then y
     Vec<double> future{player.physics.position.x, old.position.y};
     Vec<double> vx{player.physics.velocity.x,0};
-    world.move_to(future, player.size, vx);
+    engine.world.move_to(future, player.size, vx);
 
     Vec<double> vy{0,player.physics.velocity.y};
     future.y = player.physics.position.y;
-    world.move_to(future, player.size, vy);
+    engine.world.move_to(future, player.size, vy);
 
     //update position and velocity
     player.physics.position = future;
@@ -32,11 +32,11 @@ std::unique_ptr<State> State::update(Player& player, World& world, double dt){
 // Standing
 ////////////
 
-bool on_platform(const Player& player, const World& world) {
+bool on_platform(const Player& player, const Engine& engine) {
     constexpr double epsilon = 1e-2;
     Vec<double> left_foot{player.physics.position.x, player.physics.position.y - epsilon};
     Vec<double> right_foot{player.physics.position.x+player.size.x, player.physics.position.y - epsilon};
-    return world.collides(left_foot) || world.collides(right_foot);
+    return engine.world.collides(left_foot) || engine.world.collides(right_foot);
 }
 
 std::unique_ptr<State> Standing::handle_input(Player& player, const SDL_Event& event) {
@@ -57,8 +57,8 @@ std::unique_ptr<State> Standing::handle_input(Player& player, const SDL_Event& e
     }
     return nullptr;
 }
-std::unique_ptr<State> Standing::update(Player& player, World& world, double dt){
-    State::update(player,world,dt);
+std::unique_ptr<State> Standing::update(Player& player, Engine& engine, double dt){
+    State::update(player,engine,dt);
     player.physics.velocity.x *= damping; // Physics::damp()
     if (player.physics.velocity.y < 0){
         player.physics.acceleration.x = 0;
@@ -102,8 +102,8 @@ std::unique_ptr<State> Jumping::handle_input(Player& player, const SDL_Event& ev
     return nullptr;
 }
 
-std::unique_ptr<State> Jumping::update(Player& player, World& world, double dt){
-    State::update(player,world,dt);
+std::unique_ptr<State> Jumping::update(Player& player, Engine& engine, double dt){
+    State::update(player,engine,dt);
     if (player.physics.velocity.y == 0){
         return std::make_unique<Standing>();
     }
@@ -155,8 +155,8 @@ std::unique_ptr<State> Running::handle_input(Player& player, const SDL_Event& ev
     return nullptr;
 }
 
-std::unique_ptr<State> Running::update(Player& player, World& world, double dt){
-    State::update(player,world,dt);
+std::unique_ptr<State> Running::update(Player& player, Engine& engine, double dt){
+    State::update(player,engine,dt);
 
     player.physics.velocity.x *= damping; // Physics::damp()
 
@@ -201,8 +201,8 @@ std::unique_ptr<State> Shooting::handle_input(Player& player, const SDL_Event& e
     return nullptr;
 }
 
-std::unique_ptr<State> Shooting::update(Player& player, World& world, double dt){
-    State::update(player,world,dt);
+std::unique_ptr<State> Shooting::update(Player& player, Engine& engine, double dt){
+    State::update(player,engine,dt);
     return nullptr;
 }
 void Shooting::enter(Player& player){
@@ -243,8 +243,8 @@ void Sliding::enter(Player& player){
 void Sliding::exit(Player& player){
     player.physics.acceleration.x = 0;
 }
-std::unique_ptr<State> Sliding::update(Player& player, World& world, double dt){
-    State::update(player,world,dt);
+std::unique_ptr<State> Sliding::update(Player& player, Engine& engine, double dt){
+    State::update(player,engine,dt);
     player.physics.velocity.x *= damping;
     if (player.physics.acceleration.x == 0){
         return std::make_unique<Standing>();
@@ -275,8 +275,8 @@ std::unique_ptr<State> Falling::handle_input(Player& player, const SDL_Event& ev
     }
     return nullptr;
 }
-std::unique_ptr<State> Falling::update(Player& player, World& world, double dt) {
-    State::update(player,world,dt);
+std::unique_ptr<State> Falling::update(Player& player, Engine& engine, double dt) {
+    State::update(player,engine,dt);
     if (player.physics.velocity.y == 0){
         return std::make_unique<Standing>();
     }

@@ -7,6 +7,7 @@
 #include <memory>
 #include "fsm.h"
 #include "command.h"
+#include "engine.h"
 
 // forward declaration
 class World;
@@ -15,7 +16,7 @@ class Player {
 public:
     Player(const Vec<double>& position, const Vec<int>& size);
     std::unique_ptr<Command>  handle_input(const SDL_Event& event);
-    void update(World& world, double dt);
+    void update(Engine& engine, double dt);
     std::pair<Vec<double>, Color> get_sprite() const;
 
     Physics physics;
