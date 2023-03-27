@@ -2,6 +2,7 @@
 #include "graphics.h"
 #include "tilemap.h"
 #include "vec.h"
+#include "player.h"
 #include <iostream>
 
 constexpr double acceleration = 2;
@@ -52,16 +53,27 @@ void Camera::render(const Tilemap& tilemap, bool grid_on) const {
             Vec<double> position{static_cast<double>(x),
                                  static_cast<double>(y)};
             if (tile == Tile::Platform) {
-                render(position, {0, 255, 0, 255});
+                render(position, Color{0, 255, 0, 255});
             } else {
-                render(position, {0, 127, 127, 255});
+                render(position, Color{0, 127, 127, 255});
             }
 
             if (grid_on) {
-                render(position, {0, 0, 0, 255}, false);
+                render(position, Color{0, 0, 0, 255}, false);
             }
         }
     }
+}
+void Camera::render(const Vec<double>& position, const Sprite& sprite) const{
+    Vec<int> pixel = world_to_screen(position);
+    pixel.y += tilesize / 2; // shift sprites bottom center down to bottom of tile
+    graphics.draw_sprite(pixel, sprite);
+}
+
+void Camera::render(const Player& player) const{
+    render(player.physics.position, player.color);
+    render(player.physics.position, player.sprite);
+
 }
  void Camera::update(double dt){
     location += velocity * dt;

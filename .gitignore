@@ -2,3 +2,4 @@ build/*
 .vscode/
 .DS_Store
 mystic_woods_free_2.1/
+assets/

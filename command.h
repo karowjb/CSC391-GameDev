@@ -1,5 +1,6 @@
 #pragma once
-#include "engine.h"
+// #include "engine.h"
+class Engine;
 class Player;
 class World;
 

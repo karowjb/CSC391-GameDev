@@ -6,9 +6,8 @@
 #include <memory>
 
 // Forward declare 
-class Player;
 class Settings;
-
+class Player;
 class Engine {
 public:
     Engine(const Settings& settings);
@@ -17,9 +16,7 @@ public:
     Graphics graphics;
     Camera camera;
     World world;
-
     std::shared_ptr<Player> player;
-
 private:
     bool running{true};
     bool grid_on{false};

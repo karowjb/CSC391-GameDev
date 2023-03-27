@@ -19,4 +19,6 @@ void Settings::load(){
     load("screen_width", screen_width);
     load("screen_height", screen_height);
     load("tilesize", tilesize);
+    load("characters", characters);
+    load("sounds", sounds);
 }

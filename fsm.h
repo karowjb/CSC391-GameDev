@@ -2,9 +2,9 @@
 
 #include<SDL2/SDL.h>
 #include <memory>
-#include "engine.h"
 //Forward decs
 class Player;
+class Engine;
 class World;
 
 

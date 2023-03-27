@@ -2,11 +2,12 @@
 #include "world.h"
 
 
-Player::Player(const Vec<double>& position, const Vec<int>& size)
+Player::Player(Engine& engine, const Vec<double>& position, const Vec<int>& size)
     :size{size} {
         physics.position = position;
         state = std::make_unique<Standing>();
         state->enter(*this);
+        sprite = engine.graphics.get_sprite("knight");
     }
 
 std::unique_ptr<Command> Player::handle_input(const SDL_Event& event) {

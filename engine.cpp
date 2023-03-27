@@ -2,11 +2,13 @@
 #include "settings.h"
 #include "player.h"
 #include <chrono>
+// #include "camera.h"
 
 Engine::Engine(const Settings& settings)
     :graphics{settings.title, settings.screen_width,settings.screen_height}, 
     camera{graphics,settings.tilesize}, 
     world{31,11}{
+        graphics.load_spritesheet(settings.characters);
         load_level();
     }
 
@@ -19,7 +21,7 @@ void Engine::load_level(){
     world.add_platform(3,7,4,1);
     world.add_platform(13,4,6,1);
     // add player 
-    player = std::make_shared<Player>(Vec<double>{10,4},Vec<int>{1,1});
+    player = std::make_shared<Player>(*this,Vec<double>{10,4},Vec<int>{1,1});
     // move camera
     // Camera camera{graphics, tilesize};
     camera.move_to(player->physics.position);
@@ -55,6 +57,7 @@ void Engine::render(){
         camera.render(world.tilemap,grid_on);
         auto [position, color] = player->get_sprite();
         camera.render(position,color);
+        camera.render(position, player->sprite);
         graphics.update();
 }
 
