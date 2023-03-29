@@ -7,7 +7,11 @@ Player::Player(Engine& engine, const Vec<double>& position, const Vec<int>& size
         physics.position = position;
         state = std::make_unique<Standing>();
         state->enter(*this);
-        sprite = engine.graphics.get_sprite("knight");
+        standing = engine.graphics.get_animated_sprite("knight_standing",0.15,false,false);
+        jumping = engine.graphics.get_animated_sprite("knight_jumping",0.15,false,false);
+        running = engine.graphics.get_animated_sprite("knight_running",0.05,false,false);
+
+        sprite = standing.get_sprite();
     }
 
 std::unique_ptr<Command> Player::handle_input(const SDL_Event& event) {

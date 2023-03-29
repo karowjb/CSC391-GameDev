@@ -9,6 +9,8 @@ Engine::Engine(const Settings& settings)
     camera{graphics,settings.tilesize}, 
     world{31,11}{
         graphics.load_spritesheet(settings.characters);
+        audio.load_sounds(settings.sounds);
+        audio.play_sound("background", true);
         load_level();
     }
 
@@ -56,8 +58,9 @@ void Engine::render(){
     graphics.clear();
         camera.render(world.tilemap,grid_on);
         auto [position, color] = player->get_sprite();
-        camera.render(position,color);
+        // camera.render(position,color);
         camera.render(position, player->sprite);
+        // camera.render(*player);
         graphics.update();
 }
 

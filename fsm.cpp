@@ -60,6 +60,8 @@ std::unique_ptr<State> Standing::handle_input(Player& player, const SDL_Event& e
 std::unique_ptr<State> Standing::update(Player& player, Engine& engine, double dt){
     State::update(player,engine,dt);
     player.physics.velocity.x *= damping; // Physics::damp()
+    player.standing.update(dt);
+    player.sprite = player.standing.get_sprite();
     if (player.physics.velocity.y < 0){
         player.physics.acceleration.x = 0;
         return std::make_unique<Falling>(gravity);
@@ -72,6 +74,8 @@ std::unique_ptr<State> Standing::update(Player& player, Engine& engine, double d
 
 void Standing::enter(Player& player){
     player.next_command = std::make_unique<Stop>();
+    player.standing.reset();
+    player.standing.flip(player.sprite.flip);
 }
 
 
@@ -104,6 +108,8 @@ std::unique_ptr<State> Jumping::handle_input(Player& player, const SDL_Event& ev
 
 std::unique_ptr<State> Jumping::update(Player& player, Engine& engine, double dt){
     State::update(player,engine,dt);
+    player.sprite = player.jumping.get_sprite();
+    player.jumping.update(dt);
     if (player.physics.velocity.y == 0){
         return std::make_unique<Standing>();
     }
@@ -117,6 +123,7 @@ std::unique_ptr<State> Jumping::update(Player& player, Engine& engine, double dt
 void Jumping::enter(Player& player){
     player.color = {0,0,255,255};
     player.next_command = std::make_unique<Jump>(velocity);
+    // player.standing.reset();
 }
 
 void Jumping::exit(Player& player){
@@ -159,6 +166,9 @@ std::unique_ptr<State> Running::update(Player& player, Engine& engine, double dt
     State::update(player,engine,dt);
 
     player.physics.velocity.x *= damping; // Physics::damp()
+    player.running.update(dt);
+    player.sprite = player.running.get_sprite();
+
 
     if (player.physics.acceleration.x == 0){
         return std::make_unique<Standing>();
@@ -167,8 +177,10 @@ std::unique_ptr<State> Running::update(Player& player, Engine& engine, double dt
 }
 
 void Running::enter(Player& player){
+    player.running.reset();
     player.color = {255,0,255,255};
     player.next_command = std::make_unique<Accelerate>(acceleration);
+    player.running.flip(acceleration < 0);
 }
 
 void Running::exit(Player& player){

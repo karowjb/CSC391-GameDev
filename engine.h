@@ -4,6 +4,7 @@
 #include "camera.h"
 #include "graphics.h"
 #include <memory>
+#include "audio.h"
 
 // Forward declare 
 class Settings;
@@ -13,6 +14,7 @@ public:
     Engine(const Settings& settings);
     void run();
     void load_level();
+    Audio audio;
     Graphics graphics;
     Camera camera;
     World world;

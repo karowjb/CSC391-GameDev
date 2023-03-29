@@ -26,6 +26,7 @@ public:
     Vec<int> size;
     Color color{255,0,0,255};
     Sprite sprite;
+    AnimatedSprite standing, running, jumping;
     const double slide_velocity = 8.0;
     const double walk_acceleration = 3.0;
     const double jump_velocity = 10.0;

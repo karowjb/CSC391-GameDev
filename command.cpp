@@ -17,9 +17,10 @@ void Stop::execute(Player& player, Engine& ){
 Jump::Jump(double velocity)
     :velocity{velocity}{}
 
-void Jump::execute(Player& player, Engine& ){
+void Jump::execute(Player& player, Engine& engine ){
     player.color = {0,0,255,255};
     player.physics.velocity.y = velocity;
+    engine.audio.play_sound("jumping");
 }
 
 ///////////////////
@@ -64,4 +65,5 @@ Fall::Fall(double speed)
 void Fall::execute(Player& player, Engine&){
     player.color = {125,125,125,255};
     player.physics.acceleration.y = speed;
+    // engine.audio.load_sounds("landing");
 }

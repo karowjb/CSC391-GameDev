@@ -5,6 +5,7 @@
 #include <iostream>
 #include <string>
 #include <fstream>
+#include "randomness.h"
 
 Graphics::Graphics(const std::string &title, int window_width, int window_height)
     : width{window_width}, height{window_height}{
@@ -47,8 +48,9 @@ void Graphics::load_spritesheet(const std::string& filename){
     auto i = filename.find('/');
     std::string parent_path{filename.substr(0, i+1)}; //assets/
     // std::cout << parent_path << std::endl;
-    image_filename = "../assets/" + image_filename; //assets/spritesheets.png
-
+    // image_filename = "../assets/" + image_filename; //assets/spritesheets.png
+    image_filename = parent_path + image_filename;
+    std::cout << image_filename << std::endl;
 
     int texture_id = get_texture_id(image_filename);
     // std::cout << texture_id << std::endl;
@@ -62,9 +64,6 @@ void Graphics::load_spritesheet(const std::string& filename){
     while(input >> name >> x >> y >> width >> height >> scale){
         Vec shift{-width/2, -height};
         Vec center{width/2,height/2};
-        // std::cout << name << std::endl;
-        // std::cout << x << std::endl;
-        // std::cout << y << std::endl;
         int number_of_frames;
         if (!(input >> number_of_frames)){//attempt to read optional value
             number_of_frames = 1;
@@ -90,6 +89,25 @@ Sprite Graphics::get_sprite(const std::string& name) const {
     std::cout << "Found sprite" << std::endl;
     return i->second.front();
 }
+
+AnimatedSprite Graphics::get_animated_sprite(const std::string& name, double dt_per_frame,bool random_start, bool shuffle_order) const {
+    auto i = sprites.find(name);
+    if (i == sprites.end()){
+        throw std::runtime_error("cannot find animated sprite: " + name);
+    }
+    std::vector<Sprite> sprites = i->second;
+    if (shuffle_order){
+        shuffle(std::begin(sprites), std::end(sprites));
+    }
+    if (sprites.size() > 1 && random_start){
+        int starting_frame = randint(0, sprites.size()-1);
+        return AnimatedSprite{sprites,dt_per_frame,starting_frame};
+    }
+    else{
+        return AnimatedSprite(sprites,dt_per_frame);
+    }
+
+}   
 
 void Graphics::clear() {
     // clear the screen by painting it black
@@ -157,3 +175,4 @@ void Graphics::draw_sprite(const Vec<int>& pixel, const Sprite& sprite) {
     // and whether to flip the sprite horizontally
     SDL_RenderCopyEx(renderer, texture, &image_pixels, &screen_pixels, sprite.angle, &center, flip);
 }
+
