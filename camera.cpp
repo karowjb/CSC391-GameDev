@@ -74,7 +74,7 @@ void Camera::render(const Player& player) const{
 }
 void Camera::render(const std::vector<std::pair<Sprite, int>>& backgrounds) const {
     for (auto [sprite, distance] : backgrounds) {
-        int shift = static_cast<int>(sprite.location.x / distance);
+        int shift = static_cast<int>(velocity.x / distance);
         graphics.draw_sprite({-shift, 0}, sprite);
     }
 }
