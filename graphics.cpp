@@ -37,6 +37,15 @@ Graphics::~Graphics() {
     SDL_Quit();
 }
 
+Sprite Graphics::load_image(const std::string& filename) {
+    int id = get_texture_id(filename);
+    SDL_Texture* texture = textures.at(id);
+    int width, height;
+    SDL_QueryTexture(texture, nullptr, nullptr, &width, &height);
+    Sprite sprite{id, {0, 0}, {width, height}};
+    return sprite;
+}
+
 void Graphics::load_spritesheet(const std::string& filename){
     std::ifstream input{filename};
     if (!input){

@@ -20,7 +20,6 @@ Jump::Jump(double velocity)
 void Jump::execute(Player& player, Engine& engine ){
     player.color = {0,0,255,255};
     player.physics.velocity.y = velocity;
-    engine.audio.play_sound("jumping");
 }
 
 ///////////////////
@@ -51,7 +50,7 @@ void Slide::execute(Player& player, Engine& ){
 Shoot::Shoot(double speed)
     :speed{speed}{}
 
-void Shoot::execute(Player& player, Engine&){
+void Shoot::execute(Player& player, Engine& engine){
     player.color = {230,76,0,255};
     player.physics.acceleration.x = speed;
 }
@@ -62,8 +61,8 @@ void Shoot::execute(Player& player, Engine&){
 Fall::Fall(double speed)
     :speed{speed}{}
 
-void Fall::execute(Player& player, Engine&){
+void Fall::execute(Player& player, Engine& engine){
     player.color = {125,125,125,255};
     player.physics.acceleration.y = speed;
-    // engine.audio.load_sounds("landing");
+    // engine.audio.play_sound("landing");
 }

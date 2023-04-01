@@ -2,5 +2,4 @@ title game
 screen_width 1280
 screen_height 720
 tilesize 64
-characters assets/characters.txt
-sounds assets/sounds.txt
+starting_level assets/level-00

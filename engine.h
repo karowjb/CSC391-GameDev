@@ -13,7 +13,7 @@ class Engine {
 public:
     Engine(const Settings& settings);
     void run();
-    void load_level();
+    void load_level(const std::string& level_filename);
     Audio audio;
     Graphics graphics;
     Camera camera;

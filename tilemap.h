@@ -1,7 +1,14 @@
 #pragma once
 #include <vector>
+#include "sprite.h"
 
-enum class Tile {Open, Platform};
+// enum class Tile {Open, Platform};
+
+class Tile {
+    public:
+        Sprite sprite;
+        bool blocking{false};
+};
 
 class Tilemap {
 public:

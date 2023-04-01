@@ -11,6 +11,7 @@ public:
     std::string title;
     int screen_width, screen_height;
     int tilesize;
+    std::string starting_level;
     //sprites
     std::string characters;
     std::string sounds;

@@ -20,6 +20,8 @@ public:
 
     Sprite get_sprite(const std::string& name) const;
     AnimatedSprite get_animated_sprite(const std::string& name, double dt_per_frame,bool random_start=false, bool shuffle_order=false) const;
+    Sprite load_image(const std::string& filename);
+
     void load_spritesheet(const std::string& filename);
     void clear();
     void draw(const SDL_Rect& rect, const Color& color, bool filled=true);

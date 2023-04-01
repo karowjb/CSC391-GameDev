@@ -15,6 +15,7 @@ public:
     Vec<int> world_to_screen(const Vec<double>& world_position) const;
     void render(const Vec<double>&position, const Color& color, bool filled=true) const;
     void render(const Tilemap& tilemap, bool grid_on=false) const;
+    void render(const std::vector<std::pair<Sprite, int>>& backgrounds) const;
     void update(double dt);
     void render( const Vec<double>& position, const Sprite& sprite) const;
     void render(const Player& player) const;
