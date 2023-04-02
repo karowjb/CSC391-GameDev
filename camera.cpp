@@ -56,7 +56,10 @@ void Camera::render(const Tilemap& tilemap, bool grid_on) const {
             Vec<double> position{static_cast<double>(x), static_cast<double>(y)};
             render(position, tile.sprite);
             if (grid_on) {
+                std::cout << tile.blocking << std::endl;
+
                 render(position, Color{0, 0, 0, 255}, false);
+                // render(position, tile.sprite);
             }
         }
     }
@@ -68,13 +71,14 @@ void Camera::render(const Vec<double>& position, const Sprite& sprite) const{
 }
 
 void Camera::render(const Player& player) const{
-    render(player.physics.position, player.color);
+    // render(player.physics.position, player.color);
     render(player.physics.position, player.sprite);
 
 }
 void Camera::render(const std::vector<std::pair<Sprite, int>>& backgrounds) const {
     for (auto [sprite, distance] : backgrounds) {
-        int shift = static_cast<int>(velocity.x / distance);
+        int shift = static_cast<int>(location.x / distance);
+            // std::cout << sprite.texture_id <<std::endl;
         graphics.draw_sprite({-shift, 0}, sprite);
     }
 }

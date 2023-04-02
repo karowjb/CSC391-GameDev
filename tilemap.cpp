@@ -10,6 +10,8 @@ Tilemap::Tilemap(int width, int height)
         if(height < 1){
             throw std::runtime_error("Height must be positive");
         }
+        
+        // tiles.push_back()
         // std::fill(std::begin(tiles), std::end(tiles), Tile::Open);
 }
 

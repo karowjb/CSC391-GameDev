@@ -2,9 +2,9 @@
 #include "settings.h"
 #include "player.h"
 #include <chrono>
+#include <iostream>
 #include "level.h"
 #include "world.h"
-// #include "camera.h"
 
 Engine::Engine(const Settings& settings)
     :graphics{settings.title, settings.screen_width, settings.screen_height},
@@ -17,10 +17,10 @@ void Engine::load_level(const std::string& level_filename) {
     Level level{level_filename, graphics, audio};
     audio.play_sound("background", true);
     world = std::make_shared<World>(level);
-
+    // std::cout << "World Created" <<std::endl;
     // load player
     player = std::make_shared<Player>(*this, level.player_start_location, Vec<int>{1, 1});
-
+    // std::cout << "Player Created" <<std::endl;
     // move camera to start position
     camera.move_to(player->physics.position);
 }
@@ -53,7 +53,10 @@ void Engine::update(double dt){
 void Engine::render() {
     // draw the new scene
     graphics.clear();
-    camera.render(world.backgrounds);
+    camera.render(world->backgrounds);
+    camera.render(world->tilemap);
+    camera.render(*player);
+    graphics.update();
 }
 
 void Engine::run(){

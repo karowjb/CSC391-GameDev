@@ -53,21 +53,16 @@ void Graphics::load_spritesheet(const std::string& filename){
     }
     std::string image_filename;
     input >> image_filename;
-    // std::cout << image_filename << std::endl;
     auto i = filename.find('/');
     std::string parent_path{filename.substr(0, i+1)}; //assets/
-    // std::cout << parent_path << std::endl;
-    // image_filename = "../assets/" + image_filename; //assets/spritesheets.png
     image_filename = parent_path + image_filename;
     std::cout << image_filename << std::endl;
 
     int texture_id = get_texture_id(image_filename);
-    // std::cout << texture_id << std::endl;
 
 
     // load sprites -> unordered map <strings, sprites>
     std::string name;
-    // std::cout << name << std::endl;
 
     int x, y, width, height, scale;
     while(input >> name >> x >> y >> width >> height >> scale){

@@ -2,6 +2,7 @@
 #include <fstream>
 #include <algorithm>
 #include "graphics.h"
+#include <iostream>
 #include "audio.h"
 Level::Level(const std::string& filename, Graphics& graphics, Audio& audio)
     :filename{filename}{
@@ -9,7 +10,12 @@ Level::Level(const std::string& filename, Graphics& graphics, Audio& audio)
 }
 
 void Level::load(Graphics& graphics, Audio& audio){
+    std::cout << "loaded level" << std::endl;
     std::ifstream input{filename};
+    // error if can't open file
+    if (!input) {
+        throw std::runtime_error("can't open " + filename);
+    }
     // error if can't open file
 
     //load level's theme
@@ -33,6 +39,7 @@ void Level::load(Graphics& graphics, Audio& audio){
     bool rectangular = std::all_of(std::begin(lines), std::end(lines), [=](const std::string& line){
         return static_cast<int>(line.size()) == width;
     });
+    
     // error handling!
     for (int y = 0; y < height; ++y){
         for (int x = 0; x < width; ++x){
@@ -62,11 +69,17 @@ void Level::load(Graphics& graphics, Audio& audio){
 
 void Level::load_theme(const std::string& theme_filename, Graphics& graphics, Audio& audio){
     std::ifstream input{"assets/" + theme_filename};
-    // error if can't open
+     if (!input) {
+        throw std::runtime_error("can't open " + filename);
+    }
+    // std::cout << "Load theme" << std::endl;
+        // error if can't open
     std::string command;
     for (int line = 0; input >> command; ++line){
+        // std::cout << command << std::endl;
         if (command == "load-spritesheet"){
             std::string filename;
+            std::cout << filename << std::endl;
             input >> filename; //If can't error
             graphics.load_spritesheet("assets/"+filename);
         }
@@ -88,10 +101,12 @@ void Level::load_theme(const std::string& theme_filename, Graphics& graphics, Au
             std::string sprite_name;
             bool blocking;
             input >> symbol >> sprite_name >> std::boolalpha >> blocking; // If can't error
+            // std::cout << sprite_name << std::endl;
             Sprite sprite = graphics.get_sprite(sprite_name);
             tile_types[symbol] = Tile{sprite, blocking};
         }
         else{
+            std::cout << "error inputing from assets/theme" << std::endl;
             // unknown command on line 'line'
             // filename:line "error message"
         }

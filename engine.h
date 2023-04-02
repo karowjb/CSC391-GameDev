@@ -17,7 +17,7 @@ public:
     Audio audio;
     Graphics graphics;
     Camera camera;
-    World world;
+    std::shared_ptr<World> world;
     std::shared_ptr<Player> player;
 private:
     bool running{true};

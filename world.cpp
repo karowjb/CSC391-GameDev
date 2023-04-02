@@ -11,13 +11,13 @@ World::World(const Level& level)
 }
     
 
-void World::add_platform(int x, int y, int width, int height) {
-    for (int i = 0; i < height; ++i){
-        for (int j = 0; j < width;j++){
-            // tilemap(x+j, y+i) = Tile::Platform;
-        }
-    }
-}
+// void World::add_platform(int x, int y, int width, int height) {
+//     for (int i = 0; i < height; ++i){
+//         for (int j = 0; j < width;j++){
+//             // tilemap(x+j, y+i) = Tile::Platform;
+//         }
+//     }
+// }
 void World::move_to(Vec<double>& position, const Vec<int>& size, Vec<double>& velocity) {
     // test sides first, if both collide then move backwards
     // bottom side

@@ -14,11 +14,11 @@ std::unique_ptr<State> State::update(Player& player, Engine& engine, double dt){
     // attempt to move x first then y
     Vec<double> future{player.physics.position.x, old.position.y};
     Vec<double> vx{player.physics.velocity.x,0};
-    engine.world.move_to(future, player.size, vx);
+    engine.world->move_to(future, player.size, vx);
 
     Vec<double> vy{0,player.physics.velocity.y};
     future.y = player.physics.position.y;
-    engine.world.move_to(future, player.size, vy);
+    engine.world->move_to(future, player.size, vy);
 
     //update position and velocity
     player.physics.position = future;
@@ -36,10 +36,10 @@ bool on_platform(const Player& player, const Engine& engine) {
     constexpr double epsilon = 1e-2;
     Vec<double> left_foot{player.physics.position.x, player.physics.position.y - epsilon};
     Vec<double> right_foot{player.physics.position.x+player.size.x, player.physics.position.y - epsilon};
-    return engine.world.collides(left_foot) || engine.world.collides(right_foot);
+    return engine.world->collides(left_foot) || engine.world->collides(right_foot);
 }
 
-std::unique_ptr<State> Standing::handle_input(Player& player, Engine& engine, const SDL_Event& event) {
+std::unique_ptr<State> Standing::handle_input(Player& player, Engine&, const SDL_Event& event) {
     if (event.type == SDL_KEYDOWN){
         SDL_Keycode key = event.key.keysym.sym;
         if (key == SDLK_SPACE || key == SDLK_UP){
@@ -72,7 +72,7 @@ std::unique_ptr<State> Standing::update(Player& player, Engine& engine, double d
     return nullptr;
 }
 
-void Standing::enter(Player& player,Engine& engine){
+void Standing::enter(Player& player,Engine&){
     player.next_command = std::make_unique<Stop>();
     player.standing.reset();
     player.standing.flip(player.sprite.flip);
@@ -86,7 +86,7 @@ void Standing::enter(Player& player,Engine& engine){
 Jumping::Jumping(double velocity)
     :velocity{velocity}{}
 
-std::unique_ptr<State> Jumping::handle_input(Player& player, Engine& engine, const SDL_Event& event) {
+std::unique_ptr<State> Jumping::handle_input(Player& player, Engine&, const SDL_Event& event) {
       if (event.type == SDL_KEYDOWN){
         SDL_Keycode key = event.key.keysym.sym;
         if (key == SDLK_DOWN || key == SDLK_s){
@@ -142,7 +142,7 @@ void Jumping::exit(Player& player){
 Running::Running(double acceleration)
     :acceleration{acceleration}{}
 
-std::unique_ptr<State> Running::handle_input(Player& player, Engine& engine, const SDL_Event& event) {
+std::unique_ptr<State> Running::handle_input(Player& player, Engine&, const SDL_Event& event) {
     if (event.type == SDL_KEYDOWN){
         SDL_Keycode key = event.key.keysym.sym;
         if (key == SDLK_LEFT || key == SDLK_a){
@@ -197,7 +197,7 @@ void Running::exit(Player& player){
 // // Shooting
 // ////////////
 
-std::unique_ptr<State> Shooting::handle_input(Player& player, Engine& engine, const SDL_Event& event) {
+std::unique_ptr<State> Shooting::handle_input(Player& player, Engine&, const SDL_Event& event) {
     if (event.type == SDL_KEYDOWN){
         SDL_Keycode key = event.key.keysym.sym;
         if (key == SDLK_SPACE || key == SDLK_UP){
@@ -235,7 +235,7 @@ void Shooting::enter(Player& player,Engine& engine){
 Sliding::Sliding(double speed)
     :speed{speed}{}
 
-std::unique_ptr<State> Sliding::handle_input(Player& player, Engine& engine, const SDL_Event& event) {
+std::unique_ptr<State> Sliding::handle_input(Player& player, Engine&, const SDL_Event& event) {
     if (event.type == SDL_KEYDOWN){
         SDL_Keycode key = event.key.keysym.sym;
         if (key == SDLK_SPACE || key == SDLK_UP){
@@ -251,7 +251,7 @@ std::unique_ptr<State> Sliding::handle_input(Player& player, Engine& engine, con
 
     return nullptr;
 }
-void Sliding::enter(Player& player,Engine& engine){
+void Sliding::enter(Player& player,Engine&){
     if (player.physics.velocity.x < 0){
         player.next_command = std::make_unique<Slide>(-(speed*4));    
     }
@@ -280,7 +280,7 @@ std::unique_ptr<State> Sliding::update(Player& player, Engine& engine, double dt
 Falling::Falling(double speed)
     :speed{speed}{}
 
-std::unique_ptr<State> Falling::handle_input(Player& player, Engine& engine, const SDL_Event& event){
+std::unique_ptr<State> Falling::handle_input(Player& player, Engine&, const SDL_Event& event){
     if (event.type == SDL_KEYDOWN){
         SDL_Keycode key = event.key.keysym.sym;
         if (key == SDLK_DOWN || key == SDLK_s){
