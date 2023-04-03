@@ -65,7 +65,6 @@ std::unique_ptr<State> Standing::update(Player& player, Engine& engine, double d
     if (player.physics.velocity.y < 0){
         player.physics.acceleration.x = 0;
         return std::make_unique<Falling>(gravity);
-
     }
     // slide off a platform 
     //return a new state?
@@ -95,10 +94,10 @@ std::unique_ptr<State> Jumping::handle_input(Player& player, Engine&, const SDL_
             player.physics.velocity.y += (gravity*2);
         }
         else if (key == SDLK_LEFT || key == SDLK_a){
-            player.physics.velocity.x = -2.5;
+            player.physics.velocity.x = -2;
         }
          else if (key == SDLK_RIGHT || key == SDLK_d){
-            player.physics.velocity.x = 2.5;
+            player.physics.velocity.x = 2;
         }
     }
     // reduced movement in left / right directions
@@ -115,9 +114,14 @@ std::unique_ptr<State> Jumping::update(Player& player, Engine& engine, double dt
     if (player.physics.velocity.y == 0){
         return std::make_unique<Standing>();
     }
-    if (player.physics.velocity.y < 0){
+    else if (player.physics.velocity.y < 0){
         return std::make_unique<Falling>(gravity);
-
+    }
+    else if (player.physics.velocity.x < 0){
+        player.jumping.flip(true);
+    }
+    else if (player.physics.velocity.x > 0){
+        player.jumping.flip(false);
     }
     return nullptr;
 }
@@ -289,7 +293,7 @@ std::unique_ptr<State> Falling::handle_input(Player& player, Engine&, const SDL_
         else if (key == SDLK_LEFT || key == SDLK_a){
             player.physics.velocity.x = -2.5;
         }
-         else if (key == SDLK_RIGHT || key == SDLK_d){
+        else if (key == SDLK_RIGHT || key == SDLK_d){
             player.physics.velocity.x = 2.5;
         }
     }
@@ -302,10 +306,17 @@ std::unique_ptr<State> Falling::update(Player& player, Engine& engine, double dt
     if (player.physics.velocity.y == 0){
         return std::make_unique<Standing>();
     }
+    else if (player.physics.velocity.x < 0){
+        player.falling.flip(true);
+    }
+    else if (player.physics.velocity.x > 0){
+        player.falling.flip(false);
+    }
     return nullptr;
 }
 void Falling::enter(Player& player,Engine& engine) {
     engine.audio.play_sound("falling");
     player.next_command = std::make_unique<Fall>(speed);
     player.falling.reset();
+    player.falling.flip(player.sprite.flip);
 }
