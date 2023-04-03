@@ -1,17 +1,23 @@
 #include "world.h"
+#include "level.h"
 #include <cmath>
 
-World::World(int width, int height)
-    :tilemap{width, height}{}
+World::World(const Level& level)
+    :tilemap{level.width, level.height}, backgrounds{level.backgrounds} {
     
-
-void World::add_platform(int x, int y, int width, int height) {
-    for (int i = 0; i < height; ++i){
-        for (int j = 0; j < width;j++){
-            tilemap(x+j, y+i) = Tile::Platform;
-        }
+    for (auto [position, tile] : level.tiles) {
+        tilemap(position.x, position.y) = tile;
     }
 }
+    
+
+// void World::add_platform(int x, int y, int width, int height) {
+//     for (int i = 0; i < height; ++i){
+//         for (int j = 0; j < width;j++){
+//             // tilemap(x+j, y+i) = Tile::Platform;
+//         }
+//     }
+// }
 void World::move_to(Vec<double>& position, const Vec<int>& size, Vec<double>& velocity) {
     // test sides first, if both collide then move backwards
     // bottom side
@@ -88,6 +94,6 @@ void World::move_to(Vec<double>& position, const Vec<int>& size, Vec<double>& ve
 
 bool World::collides(const Vec<double>& position) const {
     int x = std::floor(position.x);
-    int y = std::floor(position.y); 
-    return tilemap(x,y) == Tile::Platform;
+    int y = std::floor(position.y);
+    return tilemap(x, y).blocking;
 }

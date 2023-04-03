@@ -2,19 +2,26 @@
 #include "world.h"
 
 
-Player::Player(const Vec<double>& position, const Vec<int>& size)
+Player::Player(Engine& engine, const Vec<double>& position, const Vec<int>& size)
     :size{size} {
         physics.position = position;
         state = std::make_unique<Standing>();
-        state->enter(*this);
+        state->enter(*this,engine);
+        standing = engine.graphics.get_animated_sprite("knight_standing",0.15,false,false);
+        jumping = engine.graphics.get_animated_sprite("knight_jumping",0.15,false,false);
+        running = engine.graphics.get_animated_sprite("knight_running",0.05,false,false);
+        falling = engine.graphics.get_animated_sprite("knight_falling",0.15,false,false);
+
+        sprite = standing.get_sprite();
     }
 
-std::unique_ptr<Command> Player::handle_input(const SDL_Event& event) {
-    auto new_state = state->handle_input(*this, event);
+std::unique_ptr<Command> Player::handle_input(Engine& engine, const SDL_Event& event) {
+    
+    auto new_state = state->handle_input(*this,engine, event);
     if (new_state){
         state->exit(*this);
         state = std::move(new_state);
-        state->enter(*this);
+        state->enter(*this,engine);
     }
     auto next = std::move(next_command);
     next_command = nullptr;
@@ -22,16 +29,16 @@ std::unique_ptr<Command> Player::handle_input(const SDL_Event& event) {
     
 }
 
-void Player::update(World& world, double dt){
-    auto new_state = state->update(*this, world, dt);
+void Player::update(Engine& engine, double dt){
+    auto new_state = state->update(*this, engine, dt);
     if (new_state){
         state->exit(*this);
         state = std::move(new_state);
-        state->enter(*this);
+        state->enter(*this,engine);
     }
 
     if (next_command){
-        next_command->execute(*this, world);
+        next_command->execute(*this, engine);
         next_command = nullptr;
     }
 }
