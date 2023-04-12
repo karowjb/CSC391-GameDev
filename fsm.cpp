@@ -2,6 +2,7 @@
 #include "player.h"
 #include "world.h"
 #include <iostream>
+#include "command.h"
 
 ////////////
 //State
@@ -23,6 +24,12 @@ std::unique_ptr<State> State::update(Player& player, Engine& engine, double dt){
     //update position and velocity
     player.physics.position = future;
     player.physics.velocity = {vx.x, vy.y};
+
+    // see if we touch a tile that has a command
+    auto command = engine.world->touch_tiles(player);
+    if (command){
+        command->execute(player, engine);
+    }
 
     return nullptr;
 }

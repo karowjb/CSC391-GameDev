@@ -1,8 +1,10 @@
 #pragma once
-// #include "engine.h"
 class Engine;
 class Player;
-class World;
+#include <memory>
+#include <vector>
+#include <string>
+// class World;
 
 class Command {
 public:
@@ -56,3 +58,19 @@ public:
 private:
     double speed;
 };
+
+class EndGame : public Command {
+public:
+    void execute(Player&, Engine& engine) override;
+};
+
+class PlaySound : public Command{
+public: 
+    PlaySound(std::string sound_name, bool is_background);
+    void execute(Player& player, Engine& engine) override;
+private:
+    std::string sound_name;
+    bool is_background;
+};
+
+std::shared_ptr<Command> create_command(std::string command_name, std::vector<std::string> arguments);

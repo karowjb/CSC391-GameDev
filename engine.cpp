@@ -81,3 +81,7 @@ void Engine::run(){
     
     }
 }
+
+void Engine::stop(){
+    running = false;
+}

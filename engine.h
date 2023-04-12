@@ -14,6 +14,7 @@ public:
     Engine(const Settings& settings);
     void run();
     void load_level(const std::string& level_filename);
+    void stop();
     Audio audio;
     Graphics graphics;
     Camera camera;

@@ -90,7 +90,7 @@ Sprite Graphics::get_sprite(const std::string& name) const {
     if (i == sprites.end()) {
         throw std::runtime_error("Cannot find sprite: " + name);
     }
-    std::cout << "Found sprite" << std::endl;
+    // std::cout << "Found sprite" << std::endl;
     return i->second.front();
 }
 

@@ -1,6 +1,7 @@
 #include "world.h"
 #include "level.h"
 #include <cmath>
+#include "player.h"
 
 World::World(const Level& level)
     :tilemap{level.width, level.height}, backgrounds{level.backgrounds} {
@@ -92,8 +93,26 @@ void World::move_to(Vec<double>& position, const Vec<int>& size, Vec<double>& ve
     }
 }
 
+std::shared_ptr<Command> World::touch_tiles(const Player& player){
+    int x = std::floor(player.physics.position.x);
+    int y = std::floor(player.physics.position.y);
+    const Vec<int>& size = player.size;
+    const std::vector<Vec<int>> displacements{{0,0},{size.x,0}, {0, size.y},{size.x,size.y}};
+    for (const Vec<int>& displacement : displacements){
+        Tile& tile = tilemap(x+displacement.x, y+displacement.y);
+        if (tile.command){
+            auto command = tile.command;
+            tile.command = nullptr;
+            return command;
+        }
+    }
+    return nullptr;
+
+}
+
 bool World::collides(const Vec<double>& position) const {
     int x = std::floor(position.x);
     int y = std::floor(position.y);
     return tilemap(x, y).blocking;
 }
+
