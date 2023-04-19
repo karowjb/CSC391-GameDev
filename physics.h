@@ -8,5 +8,5 @@ constexpr double damping = 0.92;
 class Physics {
 public:
     void update(double dt);
-    Vec<double> position, velocity, acceleration{0,gravity};
+    Vec<double> position, velocity, acceleration{0,0};
 };

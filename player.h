@@ -9,20 +9,21 @@
 #include "command.h"
 #include "engine.h"
 #include "sprite.h"
+#include "object.h"
 
 // forward declaration
 class World;
-class Player {
+class Player : public Object {
 public:
     Player(Engine& engine, const Vec<double>& position, const Vec<int>& size);
     std::unique_ptr<Command>  handle_input(Engine& engine, const SDL_Event& event);
     void update(Engine& engine, double dt);
     std::pair<Vec<double>, Color> get_sprite() const;
 
-    Physics physics;
+    // Physics physics;
     Vec<int> size;
     Color color{255,0,0,255};
-    Sprite sprite;
+    // Sprite sprite;
     AnimatedSprite standing, running, jumping, falling, sliding;
     const double slide_velocity = 5.0;
     const double walk_acceleration = 3.0;

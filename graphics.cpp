@@ -56,7 +56,7 @@ void Graphics::load_spritesheet(const std::string& filename){
     auto i = filename.find('/');
     std::string parent_path{filename.substr(0, i+1)}; //assets/
     image_filename = parent_path + image_filename;
-    std::cout << image_filename << std::endl;
+    // std::cout << image_filename << std::endl;
 
     int texture_id = get_texture_id(image_filename);
 
@@ -90,11 +90,12 @@ Sprite Graphics::get_sprite(const std::string& name) const {
     if (i == sprites.end()) {
         throw std::runtime_error("Cannot find sprite: " + name);
     }
-    // std::cout << "Found sprite" << std::endl;
     return i->second.front();
 }
 
 AnimatedSprite Graphics::get_animated_sprite(const std::string& name, double dt_per_frame,bool random_start, bool shuffle_order) const {
+    // std::cout << "Getting animated" << name << std::endl;
+
     auto i = sprites.find(name);
     if (i == sprites.end()){
         throw std::runtime_error("cannot find animated sprite: " + name);

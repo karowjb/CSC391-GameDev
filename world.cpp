@@ -9,6 +9,9 @@ World::World(const Level& level)
     for (auto [position, tile] : level.tiles) {
         tilemap(position.x, position.y) = tile;
     }
+    for (auto [position, type]: level.enemies){
+        enemies.push_back(std::make_shared<Enemy>(position, Vec<int>{1,1}, type));
+    }
 }
     
 

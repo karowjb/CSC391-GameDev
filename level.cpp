@@ -10,7 +10,7 @@ Level::Level(const std::string& filename, Graphics& graphics, Audio& audio)
 }
 
 void Level::load(Graphics& graphics, Audio& audio){
-    std::cout << "loaded level" << std::endl;
+    // std::cout << "loaded level" << std::endl;
     std::ifstream input{filename};
     // error if can't open file
     if (!input) {
@@ -36,9 +36,9 @@ void Level::load(Graphics& graphics, Audio& audio){
     width = lines.front().size();
 
     //ensure rectangular 
-    bool rectangular = std::all_of(std::begin(lines), std::end(lines), [=](const std::string& line){
-        return static_cast<int>(line.size()) == width;
-    });
+    // bool rectangular = std::all_of(std::begin(lines), std::end(lines), [=](const std::string& line){
+    //     return static_cast<int>(line.size()) == width;
+    // });
     
     // error handling!
     for (int y = 0; y < height; ++y){
@@ -53,10 +53,16 @@ void Level::load(Graphics& graphics, Audio& audio){
             }
             // determine tile type
             auto it = tile_types.find(symbol);
+            auto eit = enemy_types.find(symbol);
             if (it != tile_types.end()){
                 Vec<int> position{x,height-y-1};
                 const Tile& tile = it->second;
                 tiles.push_back({position, tile});
+            }
+            else if (eit != enemy_types.end()){
+                Vec<double> position{static_cast<double>(x), static_cast<double>(height -1 -y)};
+                const EnemyType& type = eit->second(graphics);
+                enemies.push_back({position,type});
             }
             else {
                 //error
@@ -114,6 +120,18 @@ void Level::load_theme(const std::string& theme_filename, Graphics& graphics, Au
             Sprite background = graphics.load_image("assets/" + filename);
             background.scale = scale;
             backgrounds.push_back({background, distance});
+        }
+        else if (command == "enemy"){
+            char symbol;
+            std::string type_name;
+            ss >> symbol >> type_name;
+            if (!ss){
+                std::string msg = error_message(theme_filename, line_num, "Unable to load enemy", line);
+                throw std::runtime_error(msg);
+            }
+            auto generate_enemy_type = [=](Graphics& graphics){return create_enemy_type(graphics, type_name);};
+            enemy_types[symbol] = generate_enemy_type;
+        
         } else if (command == "tile") {
             char symbol;
             std::string sprite_name;

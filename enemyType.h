@@ -1,0 +1,24 @@
+#pragma once
+#include <functional>
+#include "animatedsprite.h"
+#include "command.h"
+#include "graphics.h"
+
+class Enemy;
+class Engine;
+class EnemyType {
+public:
+    AnimatedSprite animation;
+    Vec<double> acceleration;
+
+    std::function<std::unique_ptr<Command>(Engine& engine, Enemy& enemy)> behavior;
+};
+
+EnemyType create_enemy_type(Graphics& graphics, std::string type_name);
+std::unique_ptr<Command> default_behavior(Engine&, Enemy& enemy);
+std::unique_ptr<Command> standing_behavior(Engine&, Enemy& enemy);
+
+
+EnemyType create_troll(Graphics& graphics);
+EnemyType create_monster(Graphics& graphics);
+

@@ -2,6 +2,8 @@
 #include "tilemap.h"
 #include "vec.h"
 #include "command.h"
+#include "enemy.h"
+class Player;
 class Level;
 class Sprite;
 
@@ -14,5 +16,5 @@ public:
     std::shared_ptr<Command> touch_tiles(const Player& player);
     Tilemap tilemap;
     std::vector<std::pair<Sprite, int>> backgrounds;
-    
+    std::vector<std::shared_ptr<Enemy>> enemies;
 };

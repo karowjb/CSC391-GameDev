@@ -6,7 +6,7 @@ class Graphics;
 class Tilemap;
 class Color;
 class Sprite;
-class Player;
+class Object;
 
 class Camera {
 public:
@@ -18,7 +18,7 @@ public:
     void render(const std::vector<std::pair<Sprite, int>>& backgrounds) const;
     void update(double dt);
     void render( const Vec<double>& position, const Sprite& sprite) const;
-    void render(const Player& player) const;
+    void render(const Object& object) const;
 
 private:
     Graphics& graphics;

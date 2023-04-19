@@ -70,15 +70,14 @@ void Camera::render(const Vec<double>& position, const Sprite& sprite) const{
     graphics.draw_sprite(pixel, sprite);
 }
 
-void Camera::render(const Player& player) const{
+void Camera::render(const Object& object) const{
     // render(player.physics.position, player.color);
-    render(player.physics.position, player.sprite);
+    render(object.physics.position, object.sprite);
 
 }
 void Camera::render(const std::vector<std::pair<Sprite, int>>& backgrounds) const {
     for (auto [sprite, distance] : backgrounds) {
         int shift = static_cast<int>(location.x / distance);
-            // std::cout << sprite.texture_id <<std::endl;
         graphics.draw_sprite({-shift, 0}, sprite);
     }
 }

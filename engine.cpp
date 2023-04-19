@@ -17,10 +17,8 @@ void Engine::load_level(const std::string& level_filename) {
     Level level{level_filename, graphics, audio};
     audio.play_sound("background", true);
     world = std::make_shared<World>(level);
-    // std::cout << "World Created" <<std::endl;
     // load player
     player = std::make_shared<Player>(*this, level.player_start_location, Vec<int>{1, 1});
-    // std::cout << "Player Created" <<std::endl;
     // move camera to start position
     camera.move_to(player->physics.position);
 }
@@ -44,9 +42,21 @@ void Engine::input(){
                 command->execute(*player, *this);
             }
         }
+        for (auto enemy : world->enemies){
+            auto command = enemy->next_action(*this);
+            if (command){
+                command->execute(*enemy, *this);
+            }
+        }
 }
 void Engine::update(double dt){
     player->update(*this, dt);
+    for (auto enemy : world->enemies){
+        auto command = enemy->update(*this, dt);
+        if (command){
+            command->execute(*enemy, *this);
+        }
+    }
     camera.update(dt);
 }
 
@@ -56,6 +66,9 @@ void Engine::render() {
     camera.render(world->backgrounds);
     camera.render(world->tilemap);
     camera.render(*player);
+    for (auto enemy : world->enemies){
+        camera.render(*enemy);
+    }
     graphics.update();
 }
 

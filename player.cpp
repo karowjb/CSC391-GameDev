@@ -5,6 +5,7 @@
 Player::Player(Engine& engine, const Vec<double>& position, const Vec<int>& size)
     :size{size} {
         physics.position = position;
+        physics.acceleration.y = gravity;
         state = std::make_unique<Standing>();
         state->enter(*this,engine);
         standing = engine.graphics.get_animated_sprite("knight_standing",0.15,false,false);
