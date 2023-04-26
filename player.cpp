@@ -6,6 +6,9 @@ Player::Player(Engine& engine, const Vec<double>& position, const Vec<int>& size
     :size{size} {
         physics.position = position;
         physics.acceleration.y = gravity;
+        combat.health = 5;
+        combat.max_health = 5;
+        combat.attack_damage = 3;
         state = std::make_unique<Standing>();
         state->enter(*this,engine);
         standing = engine.graphics.get_animated_sprite("knight_standing",0.15,false,false);
@@ -38,7 +41,7 @@ void Player::update(Engine& engine, double dt){
         state->enter(*this,engine);
     }
 
-    if (next_command){
+    if (next_command && running.number_of_frames() > 0){
         next_command->execute(*this, engine);
         next_command = nullptr;
     }

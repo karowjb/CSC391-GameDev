@@ -7,6 +7,9 @@ Enemy::Enemy(const Vec<double>& position, const Vec<int>& size, EnemyType& type)
     :last_edge_position{position}, size{size}, type{type}{
         physics.position = position;
         physics.acceleration = type.acceleration;
+        combat.health = type.health;
+        combat.max_health = type.health;
+        combat.attack_damage = type.damage;
         sprite = type.animation.get_sprite();
     }
 

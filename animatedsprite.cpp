@@ -13,7 +13,9 @@ void AnimatedSprite::update(double dt) {
     time += dt;
     if (time >= dt_per_frame) {
         time -= dt_per_frame;
-        current_frame = (current_frame + 1) % sprites.size();
+        if(sprites.size() > 0){
+            current_frame = (current_frame + 1) % sprites.size();
+        }
     }
 }
 
@@ -23,7 +25,12 @@ void AnimatedSprite::reset() {
 }
 
 Sprite AnimatedSprite::get_sprite() const {
-    return sprites.at(current_frame);
+    if (sprites.size() > 0){
+        return sprites.at(current_frame);
+    }
+    else {
+        return Sprite();
+    }
 }
 
 int AnimatedSprite::number_of_frames() const {

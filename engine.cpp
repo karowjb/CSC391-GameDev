@@ -51,6 +51,10 @@ void Engine::input(){
 }
 void Engine::update(double dt){
     player->update(*this, dt);
+    //check for enemy death
+
+    world->enemies.erase(std::remove_if(world->enemies.begin(),world->enemies.end(), [](std::shared_ptr<Enemy>enemy){return !enemy->combat.is_alive;}), world->enemies.end());
+    
     for (auto enemy : world->enemies){
         auto command = enemy->update(*this, dt);
         if (command){

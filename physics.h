@@ -2,7 +2,7 @@
 #include "vec.h"
 
 constexpr double terminal_velocity = 30;
-constexpr double gravity = -10;
+constexpr double gravity = -12;
 constexpr double damping = 0.92;
 
 class Physics {

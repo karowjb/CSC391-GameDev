@@ -52,14 +52,17 @@ std::unique_ptr<State> Standing::handle_input(Player& player, Engine&, const SDL
         if (key == SDLK_SPACE || key == SDLK_UP){
             return std::make_unique<Jumping>(player.jump_velocity);
         }
-        if (key == SDLK_RIGHT || key == SDLK_d){
+        else if (key == SDLK_RIGHT || key == SDLK_d){
             return std::make_unique<Running>(player.walk_acceleration);
         }
-        if (key == SDLK_LEFT || key == SDLK_a){
+        else if (key == SDLK_LEFT || key == SDLK_a){
             return std::make_unique<Running>(-player.walk_acceleration);
         }
-        if (key == SDLK_x){
+        else if (key == SDLK_x){
             return std::make_unique<Shooting>();
+        }
+        else if (key == SDLK_q){
+            return std::make_unique<AttackAll>();
         }
     }
     return nullptr;
@@ -326,4 +329,23 @@ void Falling::enter(Player& player,Engine& engine) {
     player.next_command = std::make_unique<Fall>(speed);
     player.falling.reset();
     player.falling.flip(player.sprite.flip);
+}
+
+/////////////
+// Attack All 
+////////////
+
+std::unique_ptr<State> AttackAll::handle_input(Player&, Engine&, const SDL_Event& event) {
+    if (event.type == SDL_KEYUP){
+        SDL_Keycode key = event.key.keysym.sym;
+        if (key == SDLK_q){
+            return std::make_unique<Standing>();
+        }
+    }
+    return nullptr;
+}
+void AttackAll::enter(Player& player,Engine& engine) {
+    for (auto enemy : engine.world->enemies){
+        player.combat.attack(*enemy);
+    }
 }

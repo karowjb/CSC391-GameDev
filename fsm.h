@@ -80,3 +80,9 @@ public:
 private:
     double speed;
 };
+
+
+class AttackAll : public State{
+    std::unique_ptr<State> handle_input(Player& player, Engine& engine, const SDL_Event& event) override;
+    void enter(Player& player,Engine& engine) override;
+};

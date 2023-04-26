@@ -28,10 +28,10 @@ std::unique_ptr<Command> standing_behavior(Engine&, Enemy&){
 EnemyType create_troll(Graphics& graphics){
     Vec<double> acceleration {-15,0};
     AnimatedSprite sprite = graphics.get_animated_sprite("troll_running",0.15, true, false);
-    return EnemyType{sprite, acceleration, default_behavior};
+    return EnemyType{sprite, acceleration,8,2, default_behavior};
 }
 EnemyType create_monster(Graphics& graphics){
     Vec<double> acceleration {0,0};
     AnimatedSprite sprite = graphics.get_animated_sprite("monster_standing",0.15, true, false);
-    return EnemyType{sprite, acceleration, standing_behavior};
+    return EnemyType{sprite, acceleration,6,3, standing_behavior};
 }
