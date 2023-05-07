@@ -3,6 +3,7 @@
 #include "vec.h"
 #include "command.h"
 #include "enemy.h"
+#include "quadtree.h"
 class Player;
 class Level;
 class Sprite;
@@ -17,4 +18,8 @@ public:
     Tilemap tilemap;
     std::vector<std::pair<Sprite, int>> backgrounds;
     std::vector<std::shared_ptr<Enemy>> enemies;
+    std::vector<Projectile> projectiles;
+    void build_quadtree();
+    void remove_inactive();
+    QuadTree quadtree;
 };

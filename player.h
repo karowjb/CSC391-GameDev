@@ -10,7 +10,7 @@
 #include "engine.h"
 #include "sprite.h"
 #include "object.h"
-
+#include "projectile.h"
 // forward declaration
 class World;
 class Player : public Object {
@@ -30,4 +30,6 @@ public:
     const double jump_velocity = 10.0;
     std::unique_ptr<State>state;
     std::unique_ptr<Command> next_command;
+
+    Projectile arrow;
 };

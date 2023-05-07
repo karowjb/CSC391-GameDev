@@ -17,6 +17,9 @@ Player::Player(Engine& engine, const Vec<double>& position, const Vec<int>& size
         falling = engine.graphics.get_animated_sprite("knight_falling",0.15,false,false);
 
         sprite = standing.get_sprite();
+        arrow.sprite = engine.graphics.get_sprite("arrow");
+        arrow.combat.invincible = true;
+        arrow.combat.attack_damage = 1;
     }
 
 std::unique_ptr<Command> Player::handle_input(Engine& engine, const SDL_Event& event) {

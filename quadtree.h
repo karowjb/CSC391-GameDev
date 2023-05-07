@@ -3,6 +3,7 @@
 #include <vector>
 
 #include "vec.h"
+class Object;
 
 // rectangular axis aligned bounding box
 struct AABB {
@@ -16,12 +17,12 @@ class QuadTree{
 public:
     QuadTree(AABB boundary);
     void clear();
-    bool insert(Vec<double> object);
+    bool insert(Object* object);
     void subdivide();
-    std::vector<Vec<double>> query_range(AABB range) const;
+    std::vector<Object*> query_range(AABB range) const;
     static constexpr std::size_t NODE_CAPACITY = 4;
     AABB boundary;
-    std::vector<Vec<double>> objects;
+    std::vector<Object*> objects;
     std::shared_ptr<QuadTree> north_west, north_east, south_west, south_east;
 
 };

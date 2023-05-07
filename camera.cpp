@@ -81,6 +81,21 @@ void Camera::render(const std::vector<std::pair<Sprite, int>>& backgrounds) cons
         graphics.draw_sprite({-shift, 0}, sprite);
     }
 }
+void Camera::render_life(int life, int max_life){
+    Sprite heart = graphics.get_sprite("heart");
+    Sprite empty_heart = graphics.get_sprite("empty_heart");
+    for (int i = 0; i < life; ++i){
+        Vec<int> position{35,65};
+        position.x += i * 64 + 10;
+        graphics.draw_sprite(position, heart);
+    }
+    for (int i = life; i < max_life; ++i){
+        Vec<int> position{35,65};
+        position.x += i * 64 + 10;
+        graphics.draw_sprite(position, empty_heart);
+    }
+}
+
  void Camera::update(double dt){
     location += velocity * dt;
      if (location.y < middlePoint){

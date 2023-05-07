@@ -35,7 +35,19 @@ void Accelerate::execute(Object& object, Engine& ){
     // object.color = {0,51,0,255};
     object.physics.acceleration.x = acceleration;
 }
+///////////////////
+// FireProjectile
+///////////////////
+FireProjectile::FireProjectile(Projectile projectile, Vec<double> position, Vec<double> velocity)
+    :projectile{projectile}{
+        this->projectile.physics.position = position;
+        this->projectile.physics.velocity = velocity;
+        this->projectile.physics.acceleration.y = gravity;
+}
 
+void FireProjectile::execute(Object&, Engine& engine){
+    engine.world->projectiles.push_back(projectile);
+}
 ///////////////////
 // Slide
 ///////////////////
@@ -89,7 +101,8 @@ LoadLevel::LoadLevel(const std::string& filename)
 
 void LoadLevel::execute(Object&, Engine& engine) {
     // std::cout << "Loading level" << std::endl;
-    engine.load_level("assets/" + filename);
+    engine.next_level = "assets/" + filename;
+    // engine.load_level("assets/" + filename);
     // std::cout << "assets/" << filename << std::endl;
 
 

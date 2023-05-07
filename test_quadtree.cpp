@@ -11,7 +11,7 @@ void draw_quadtree(Graphics& graphics, const QuadTree& quadtree);
 
 int main() {
     Graphics graphics{"QuadTree demo", 1280, 720};
-    int N = 100;
+    int N = 1000;
     
     std::vector<Vec<double>> points(N);
     std::generate(std::begin(points), std::end(points),

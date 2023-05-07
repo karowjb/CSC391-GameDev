@@ -20,6 +20,7 @@ public:
     void render( const Vec<double>& position, const Sprite& sprite) const;
     void render(const Object& object) const;
 
+    void render_life(int life, int max_life);
 private:
     Graphics& graphics;
     int tilesize;

@@ -5,6 +5,7 @@
 #include "graphics.h"
 #include <memory>
 #include "audio.h"
+#include <optional>
 
 // Forward declare 
 class Settings;
@@ -20,6 +21,7 @@ public:
     Camera camera;
     std::shared_ptr<World> world;
     std::shared_ptr<Player> player;
+    std::optional<std::string> next_level;
 private:
     bool running{true};
     bool grid_on{false};

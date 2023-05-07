@@ -1,5 +1,6 @@
 #include "quadtree.h"
 #include <algorithm>
+#include "object.h"
 
 bool AABB::contains(const Vec<double>& point) const{
     Vec<double> displacement = point - center;
@@ -29,9 +30,9 @@ void QuadTree::clear(){
         south_east = nullptr;
     }
 }
-bool QuadTree::insert(Vec<double> object){
+bool QuadTree::insert(Object* object){
     // ignore objects that don't belong in here
-    if (!boundary.contains(object)){
+    if (!boundary.contains(object->physics.position)){
         return false;
     }
     // if there is space and no children, object is stored here
@@ -57,21 +58,21 @@ void QuadTree::subdivide(){
     south_west = std::make_shared<QuadTree>(AABB{{boundary.center.x-half.x, boundary.center.y-half.y},half});
     south_east = std::make_shared<QuadTree>(AABB{{boundary.center.x+half.x, boundary.center.y-half.y},half});
 
-    for (Vec<double> object : objects){
+    for (Object* object : objects){
         insert(object);
     }
     objects.clear();
 }
 
-std::vector<Vec<double>> QuadTree::query_range(AABB range) const{
+std::vector<Object*> QuadTree::query_range(AABB range) const{
     if (!boundary.intersects(range)){
         return{};
     }
     // handle leaf nodes
-    std::vector<Vec<double>> results;
+    std::vector<Object*> results;
     if (north_west == nullptr){
-        std::copy_if(std::begin(objects), std::end(objects), std::back_inserter(results), [&](const Vec<double>& object){
-            return range.contains(object);
+        std::copy_if(std::begin(objects), std::end(objects), std::back_inserter(results), [&](Object* object){
+            return range.contains(object->physics.position);
         });
         return results;
     }

@@ -5,6 +5,7 @@
 #include <iostream>
 #include "level.h"
 #include "world.h"
+#include "projectile.h"
 
 Engine::Engine(const Settings& settings)
     :graphics{settings.title, settings.screen_width, settings.screen_height},
@@ -51,17 +52,48 @@ void Engine::input(){
 }
 void Engine::update(double dt){
     player->update(*this, dt);
-    //check for enemy death
+    camera.update(dt);
 
-    world->enemies.erase(std::remove_if(world->enemies.begin(),world->enemies.end(), [](std::shared_ptr<Enemy>enemy){return !enemy->combat.is_alive;}), world->enemies.end());
-    
     for (auto enemy : world->enemies){
         auto command = enemy->update(*this, dt);
         if (command){
             command->execute(*enemy, *this);
         }
     }
-    camera.update(dt);
+    for (auto& projectile : world->projectiles){
+        projectile.update(*this, dt);
+    }
+
+    //handle collisions between enemy and player
+    world->build_quadtree();
+    AABB player_box{player->physics.position, {1.0*player->size.x, 1.0*player->size.y}};
+    std::vector<Object*> enemies = world->quadtree.query_range(player_box);
+    if (enemies.size() > 0){
+        auto enemy = enemies.front();
+        enemy->combat.attack(*player);
+        // std::cout << player->combat.health << '\n';
+        //enter the hurting state
+        player->state->exit(*player);
+        player->state = std::make_unique<Hurting>();
+        player->state->enter(*player, *this);
+    }
+    // Handle projectile collisions
+    for (auto& projectile : world->projectiles){
+        AABB projectile_box{projectile.physics.position, {1.0*projectile.size.x, 1.0*projectile.size.y}};
+        std::vector<Object*> enemies = world->quadtree.query_range(projectile_box);
+        for (auto enemy : enemies){
+            projectile.combat.attack(*enemy);
+        }
+    }
+    //end game
+    if (!player->combat.is_alive){
+        EndGame endgame;
+        endgame.execute(*player, *this);
+        return;
+    }
+     //check for enemy death
+     world->remove_inactive();
+   
 }
 
 void Engine::render() {
@@ -69,9 +101,13 @@ void Engine::render() {
     graphics.clear();
     camera.render(world->backgrounds);
     camera.render(world->tilemap);
+    camera.render_life(player->combat.health, player->combat.max_health);
     camera.render(*player);
     for (auto enemy : world->enemies){
         camera.render(*enemy);
+    }
+    for (auto& projectile : world->projectiles){
+        camera.render(projectile);
     }
     graphics.update();
 }
@@ -81,6 +117,10 @@ void Engine::run(){
     auto previous = std::chrono::high_resolution_clock::now();
     double lag{0.0};
     while (running) {
+        if (next_level){
+            load_level(next_level.value());
+            next_level.reset();
+        }
         auto current = std::chrono::high_resolution_clock::now();
         std::chrono::duration<double> elapsed = current - previous;
         previous = current;

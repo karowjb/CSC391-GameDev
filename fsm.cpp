@@ -3,6 +3,7 @@
 #include "world.h"
 #include <iostream>
 #include "command.h"
+#include "randomness.h"
 
 ////////////
 //State
@@ -63,6 +64,17 @@ std::unique_ptr<State> Standing::handle_input(Player& player, Engine&, const SDL
         }
         else if (key == SDLK_q){
             return std::make_unique<AttackAll>();
+        }
+        else if (key == SDLK_f){
+            Vec<double> position {player.physics.position.x+player.size.x, player.physics.position.y+player.size.y};
+            Vec<double> velocity {15,2};
+            velocity.x += randint(-1,1);
+            velocity.y += randint(-1,1);
+            if (player.sprite.flip){
+                position = {player.physics.position.x, player.physics.position.y+player.size.y};
+                velocity.x *= -1;
+            }
+            player.next_command = std::make_unique<FireProjectile>(player.arrow,position,velocity);
         }
     }
     return nullptr;
@@ -349,3 +361,49 @@ void AttackAll::enter(Player& player,Engine& engine) {
         player.combat.attack(*enemy);
     }
 }
+
+/////////////
+// Hurting
+////////////
+
+std::unique_ptr<State> Hurting::handle_input(Player& player, Engine&, const SDL_Event& event) {
+    if (event.type == SDL_KEYUP){
+    SDL_Keycode key = event.key.keysym.sym;
+    if (key == SDLK_LEFT){
+        player.next_command = std::make_unique<Accelerate>(-player.walk_acceleration / .5);
+        player.sprite.flip = true;
+    }
+    else if (key == SDLK_RIGHT){
+        player.next_command = std::make_unique<Accelerate>(player.walk_acceleration / .5);
+        player.sprite.flip = false;
+    }
+    }
+    if (event.type == SDL_KEYUP){
+        SDL_Keycode key = event.key.keysym.sym;
+        if (key == SDLK_LEFT || key == SDLK_RIGHT){
+            player.next_command = std::make_unique<Accelerate>(0);
+        }
+
+    }
+return nullptr;
+}
+std::unique_ptr<State> Hurting::update(Player& player, Engine& engine, double dt) {
+    elapsed_time += dt;
+    if (elapsed_time >= cooldown){
+        return std::make_unique<Standing>();
+    }
+    State::update(player, engine, dt);
+    // player.physics
+    // player.physics.velocity.x *= damping;
+    player.sprite.flip = !player.sprite.flip;
+    return nullptr;
+}
+
+ void Hurting::enter(Player& player,Engine&){
+    elapsed_time = 0;
+    player.combat.invincible = true;
+
+ }
+ void Hurting::exit(Player& player) {
+    player.combat.invincible = false;
+ }
