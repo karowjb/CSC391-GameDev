@@ -4,8 +4,6 @@
 #include <memory>
 #include "command.h"
 
-// enum class Tile {Open, Platform};
-
 class Tile {
     public:
         Sprite sprite;

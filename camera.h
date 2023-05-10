@@ -7,6 +7,7 @@ class Tilemap;
 class Color;
 class Sprite;
 class Object;
+class Player;
 
 class Camera {
 public:
@@ -19,6 +20,8 @@ public:
     void update(double dt);
     void render( const Vec<double>& position, const Sprite& sprite) const;
     void render(const Object& object) const;
+    void render(const Player& player) const;
+
 
     void render_life(int life, int max_life);
 private:

@@ -6,6 +6,7 @@
 #include "level.h"
 #include "world.h"
 #include "projectile.h"
+#include "loadscreen.h"
 
 Engine::Engine(const Settings& settings)
     :graphics{settings.title, settings.screen_width, settings.screen_height},
@@ -24,6 +25,13 @@ void Engine::load_level(const std::string& level_filename) {
     camera.move_to(player->physics.position);
 }
 
+void Engine::setup_end_screen() {
+    running = true;
+    Loadscreen game_over{"assets/game-over.txt", graphics, audio};
+    audio.play_sound("endgame");
+
+    world->backgrounds = game_over.backgrounds;
+}
 void Engine::input(){
     // Input
         SDL_Event event;
@@ -71,9 +79,8 @@ void Engine::update(double dt){
     if (enemies.size() > 0){
         auto enemy = enemies.front();
         enemy->combat.attack(*player);
-        // std::cout << player->combat.health << '\n';
         //enter the hurting state
-        player->state->exit(*player);
+        player->state->exit(*player, *this);
         player->state = std::make_unique<Hurting>();
         player->state->enter(*player, *this);
     }
@@ -135,7 +142,20 @@ void Engine::run(){
             lag -= dt;
         }
         render();
-    
+    }
+    setup_end_screen();
+
+    while (running) {
+        SDL_Event event;
+        while (SDL_PollEvent(&event)) {
+            if (event.type == SDL_QUIT) {  // closing the window
+                running = false;
+                break;
+            }
+        }
+        graphics.clear();
+        camera.render(world->backgrounds);
+        graphics.update();
     }
 }
 

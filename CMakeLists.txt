@@ -31,8 +31,7 @@ add_library(gamelib
   combat.cpp
   quadtree.cpp
   projectile.cpp
-  # animate_quadtree.cpp
-  # perf_quadtree.cpp
+  loadscreen.cpp
 )
 
 target_include_directories(gamelib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${SDL2_INCLUDE_DIRS} ${SDL2_IMAGE_INCLUDE_DIRS})

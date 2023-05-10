@@ -15,9 +15,6 @@ Camera::Camera(Graphics& graphics, int tilesize)
 
 void Camera::move_to(const Vec<double>& new_location) {
     velocity = (new_location - location) * acceleration;
-    // location = new_location;
-
-    // calculate_visible_tiles();
 }
 
 Vec<int> Camera::world_to_screen(const Vec<double>& world_position) const {
@@ -59,7 +56,6 @@ void Camera::render(const Tilemap& tilemap, bool grid_on) const {
                 std::cout << tile.blocking << std::endl;
 
                 render(position, Color{0, 0, 0, 255}, false);
-                // render(position, tile.sprite);
             }
         }
     }
@@ -71,10 +67,22 @@ void Camera::render(const Vec<double>& position, const Sprite& sprite) const{
 }
 
 void Camera::render(const Object& object) const{
-    // render(player.physics.position, player.color);
     render(object.physics.position, object.sprite);
 
 }
+void Camera::render(const Player& player) const{
+    render(player.physics.position, player.sprite);
+    if (player.sprite.flip){
+        // int bowPos = player.sprite.shift(player.size.x);
+        render(player.physics.position, player.bow);
+    }
+    // player.bow.flip = true;
+    render(player.physics.position, player.bow);
+    render(player.physics.position, player.sword.sprite);
+
+    
+}
+
 void Camera::render(const std::vector<std::pair<Sprite, int>>& backgrounds) const {
     for (auto [sprite, distance] : backgrounds) {
         int shift = static_cast<int>(location.x / distance);
@@ -101,22 +109,7 @@ void Camera::render_life(int life, int max_life){
      if (location.y < middlePoint){
         location.y = middlePoint;
     }
-    // else if (location.y < 5){
-    //     location.y = ;
-    // }
-    // if (static_cast<double>(visible_max.y)/2 > location.y){
-    //     location.y = static_cast<double>(visible_max.y)/2;
-    // }
-    // else if (static_cast<double>(visible_max.y)/2 < location.y){
-    //     location.y = 5;
-    // }
-    // else if(location.y < visible_max.y/2){
-    //     location.y = 3;
-    // }
     calculate_visible_tiles();
-    // else {
-    //     location.y = static_cast<double>(visible_max.y/4);
-    // }
 }
 
 void Camera::calculate_visible_tiles() {
@@ -124,8 +117,6 @@ void Camera::calculate_visible_tiles() {
     Vec<int> num_tiles = Vec{graphics.width, graphics.height};
     num_tiles /= (2 * tilesize);
     num_tiles += Vec{1, 1};
-    // (Vec{graphics.width, graphics.height} / (2 * tilesize)) + Vec{1, 1};
-
     Vec<int> center{static_cast<int>(location.x), static_cast<int>(location.y)};
     visible_max = center + num_tiles;
     visible_min = center - num_tiles;

@@ -1,6 +1,7 @@
 #pragma once
 class Engine;
 class Object;
+class Player;
 #include <memory>
 #include <vector>
 #include "projectile.h"
@@ -59,6 +60,12 @@ public:
 private:
     Projectile projectile;
 };
+
+// class SwingSword : public Command{
+// public:
+//     SwingSword(Object& object, Engine& engine, Player& player);
+//     void execute(Object& object, Engine& engine) override;
+// };
 
 class Fall : public Command {
 public:

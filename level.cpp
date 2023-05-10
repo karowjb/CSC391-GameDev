@@ -10,7 +10,6 @@ Level::Level(const std::string& filename, Graphics& graphics, Audio& audio)
 }
 
 void Level::load(Graphics& graphics, Audio& audio){
-    // std::cout << "loaded level" << std::endl;
     std::ifstream input{filename};
     // error if can't open file
     if (!input) {
@@ -34,12 +33,6 @@ void Level::load(Graphics& graphics, Audio& audio){
     // set level dimensions
     height = lines.size();
     width = lines.front().size();
-
-    //ensure rectangular 
-    // bool rectangular = std::all_of(std::begin(lines), std::end(lines), [=](const std::string& line){
-    //     return static_cast<int>(line.size()) == width;
-    // });
-    
     // error handling!
     for (int y = 0; y < height; ++y){
         for (int x = 0; x < width; ++x){
@@ -152,7 +145,6 @@ void Level::load_theme(const std::string& theme_filename, Graphics& graphics, Au
                 tile.command = create_command(command_name, arguements);
             }
             tile_types[symbol] = tile;
-            // tile_types[symbol] = Tile{sprite, blocking};
         } else {
             std::string msg = error_message(theme_filename, line_num, "Unknown command", line);
             throw std::runtime_error(msg);

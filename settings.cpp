@@ -20,6 +20,4 @@ void Settings::load(){
     load("screen_height", screen_height);
     load("tilesize", tilesize);
     load("starting_level", starting_level);
-    // load("characters", characters);
-    // load("sounds", sounds);
 }

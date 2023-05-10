@@ -19,17 +19,16 @@ public:
     std::unique_ptr<Command>  handle_input(Engine& engine, const SDL_Event& event);
     void update(Engine& engine, double dt);
     std::pair<Vec<double>, Color> get_sprite() const;
-
-    // Physics physics;
     Vec<int> size;
+    
     Color color{255,0,0,255};
-    // Sprite sprite;
     AnimatedSprite standing, running, jumping, falling, sliding;
     const double slide_velocity = 5.0;
     const double walk_acceleration = 3.0;
     const double jump_velocity = 10.0;
     std::unique_ptr<State>state;
     std::unique_ptr<Command> next_command;
-
+    Sprite bow;
+    Sword sword;
     Projectile arrow;
 };

@@ -35,8 +35,6 @@ void Audio::load_sounds(const std::string& filename){
     }
     auto i = filename.find('/');
     std::string parent_path{filename.substr(0,i+1)};
-    // std::string parent_path{"../assets/"};
-
     std::string name, file;
     while(input >> name >> file){
         std::string full_path = parent_path + file;
