@@ -9,6 +9,8 @@ Player::Player(Engine& engine, const Vec<double>& position, const Vec<int>& size
         combat.health = 9;
         combat.max_health = 9;
         combat.attack_damage = 3;
+        combat.max_potions = 3;
+        combat.potions = 3;
         state = std::make_unique<Standing>();
         state->enter(*this,engine);
         standing = engine.graphics.get_animated_sprite("knight_standing",0.15,false,false);
@@ -19,7 +21,9 @@ Player::Player(Engine& engine, const Vec<double>& position, const Vec<int>& size
         sprite = standing.get_sprite();
         arrow.sprite = engine.graphics.get_sprite("arrow");
         bow = engine.graphics.get_sprite("none");
+        shield = engine.graphics.get_sprite("none");
         sword.sprite = engine.graphics.get_sprite("none");
+        spear.sprite = engine.graphics.get_sprite("none");
         arrow.combat.invincible = true;
         arrow.combat.attack_damage = 2;
         sword.combat.attack_damage = 1;
@@ -55,4 +59,11 @@ void Player::update(Engine& engine, double dt){
 
 std::pair<Vec<double>, Color> Player::get_sprite() const {
     return {physics.position, color};
+}
+
+void Player::mutate(Engine& engine){
+    standing = engine.graphics.get_animated_sprite("ninja_standing",0.15,false,false);
+    jumping = engine.graphics.get_animated_sprite("ninja_jumping",0.15,false,false);
+    running = engine.graphics.get_animated_sprite("ninja_running",0.05,false,false);
+    falling = engine.graphics.get_animated_sprite("ninja_falling",0.15,false,false);
 }

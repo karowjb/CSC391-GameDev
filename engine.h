@@ -22,11 +22,15 @@ public:
     std::shared_ptr<World> world;
     std::shared_ptr<Player> player;
     std::optional<std::string> next_level;
+    bool victory{false};
+
 private:
     bool running{true};
     bool grid_on{false};
     void input();
     void update(double dt);
     void render();
-    void setup_end_screen();
+    void setup_death_screen();
+    void setup_victory_screen();
+
 };

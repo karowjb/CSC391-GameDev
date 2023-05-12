@@ -78,9 +78,9 @@ void Camera::render(const Player& player) const{
     }
     // player.bow.flip = true;
     render(player.physics.position, player.bow);
+    render(player.physics.position, player.shield);
     render(player.physics.position, player.sword.sprite);
-
-    
+    render(player.physics.position, player.spear.sprite);
 }
 
 void Camera::render(const std::vector<std::pair<Sprite, int>>& backgrounds) const {
@@ -101,6 +101,21 @@ void Camera::render_life(int life, int max_life){
         Vec<int> position{35,65};
         position.x += i * 64 + 10;
         graphics.draw_sprite(position, empty_heart);
+    }
+}
+
+void Camera::render_potion(int potions, int max_potions){
+    Sprite potion = graphics.get_sprite("potion_full");
+    Sprite empty_potion = graphics.get_sprite("potion_empty");
+    for (int i = 0; i < potions; ++i){
+        Vec<int> position{30,125};
+        position.x += i * 64 + 10;
+        graphics.draw_sprite(position, potion);
+    }
+    for (int i = potions; i < max_potions; ++i){
+        Vec<int> position{30,125};
+        position.x += i * 64 + 10;
+        graphics.draw_sprite(position, empty_potion);
     }
 }
 

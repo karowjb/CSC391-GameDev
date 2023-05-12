@@ -8,6 +8,12 @@ EnemyType create_enemy_type(Graphics& graphics, std::string type_name){
     else if (type_name == "monster"){
         return create_monster(graphics);
     }
+    else if(type_name == "dwarf"){
+        return create_dwarf(graphics);
+    }
+    else if(type_name == "skeleton"){
+        return create_skeleton_patrol(graphics);
+    }
     else {
         throw std::runtime_error("Unknown enemy type " + type_name);
     }
@@ -30,12 +36,25 @@ std::unique_ptr<Command> hurting(Engine&, Enemy&){
 }
 
 EnemyType create_troll(Graphics& graphics){
-    Vec<double> acceleration {-15,0};
+    Vec<double> acceleration {-15,gravity};
     AnimatedSprite sprite = graphics.get_animated_sprite("orc_running",0.15, true, false);
+    // sprite, acceleration, health, damage, hurting, elapsed time
     return EnemyType{sprite, acceleration,4,2,1,0, default_behavior};
 }
 EnemyType create_monster(Graphics& graphics){
-    Vec<double> acceleration {0,0};
+    Vec<double> acceleration {0,gravity};
     AnimatedSprite sprite = graphics.get_animated_sprite("skeleton_standing",0.15, true, false);
-    return EnemyType{sprite, acceleration,2,3,1,0, standing_behavior};
+    // sprite, acceleration, health, damage, hurting, elapsed time
+    return EnemyType{sprite, acceleration,5,3,1,0, standing_behavior};
+}
+
+EnemyType create_dwarf(Graphics& graphics){
+    Vec<double> acceleration {-20,gravity};
+    AnimatedSprite sprite = graphics.get_animated_sprite("dwarf_running", 0.15, true, false);
+    return EnemyType{sprite, acceleration, 20,1,1,0, default_behavior};
+}
+EnemyType create_skeleton_patrol(Graphics& graphics){
+    Vec<double> acceleration {-15, gravity};
+    AnimatedSprite sprite = graphics.get_animated_sprite("skeleton_running", 0.15, true, false);
+    return EnemyType{sprite, acceleration, 10,3,1,0, default_behavior};
 }

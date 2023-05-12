@@ -25,9 +25,16 @@ void Engine::load_level(const std::string& level_filename) {
     camera.move_to(player->physics.position);
 }
 
-void Engine::setup_end_screen() {
+void Engine::setup_death_screen() {
     running = true;
     Loadscreen game_over{"assets/game-over.txt", graphics, audio};
+    audio.play_sound("endgame");
+
+    world->backgrounds = game_over.backgrounds;
+}
+void Engine::setup_victory_screen() {
+    running = true;
+    Loadscreen game_over{"assets/victory.txt", graphics, audio};
     audio.play_sound("endgame");
 
     world->backgrounds = game_over.backgrounds;
@@ -98,6 +105,10 @@ void Engine::update(double dt){
         endgame.execute(*player, *this);
         return;
     }
+    if (victory){
+        Victory victory;
+        victory.execute(*player, *this);
+    }
      //check for enemy death
      world->remove_inactive();
    
@@ -108,6 +119,7 @@ void Engine::render() {
     graphics.clear();
     camera.render(world->backgrounds);
     camera.render(world->tilemap);
+    camera.render_potion(player->combat.potions, player->combat.max_potions);
     camera.render_life(player->combat.health, player->combat.max_health);
     camera.render(*player);
     for (auto enemy : world->enemies){
@@ -143,7 +155,12 @@ void Engine::run(){
         }
         render();
     }
-    setup_end_screen();
+    if (victory){
+        setup_victory_screen();
+    }
+    else{
+        setup_death_screen();
+    }
 
     while (running) {
         SDL_Event event;

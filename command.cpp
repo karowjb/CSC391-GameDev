@@ -90,6 +90,14 @@ void EndGame::execute(Object&, Engine& engine){
     engine.stop();
 }
 
+///////////////////
+// Victory
+///////////////////
+void Victory::execute(Object&, Engine& engine){
+    engine.victory = true;
+    engine.stop();
+}
+
 PlaySound::PlaySound(std::string sound_name, bool is_background)
     :sound_name{sound_name}, is_background{is_background}{}
 void PlaySound::execute(Object&, Engine& engine){
@@ -106,6 +114,9 @@ void LoadLevel::execute(Object&, Engine& engine) {
 std::shared_ptr<Command> create_command(std::string command_name, std::vector<std::string> arguments) {
     if (command_name == "end_game"){
         return std::make_shared<EndGame>();
+    }
+    else if (command_name == "victory"){
+        return std::make_shared<Victory>();
     }
     else if (command_name == "play_sound"){
         bool is_background = arguments.at(1) == "true" ? true : false;

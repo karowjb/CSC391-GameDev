@@ -23,4 +23,6 @@ std::unique_ptr<Command> hurting(Engine&, Enemy& enemy);
 
 EnemyType create_troll(Graphics& graphics);
 EnemyType create_monster(Graphics& graphics);
+EnemyType create_dwarf(Graphics& graphics);
+EnemyType create_skeleton_patrol(Graphics& graphics);
 

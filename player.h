@@ -18,6 +18,7 @@ public:
     Player(Engine& engine, const Vec<double>& position, const Vec<int>& size);
     std::unique_ptr<Command>  handle_input(Engine& engine, const SDL_Event& event);
     void update(Engine& engine, double dt);
+    void mutate(Engine& engine);
     std::pair<Vec<double>, Color> get_sprite() const;
     Vec<int> size;
     
@@ -29,6 +30,9 @@ public:
     std::unique_ptr<State>state;
     std::unique_ptr<Command> next_command;
     Sprite bow;
+    Sprite shield;
     Sword sword;
+    Spear spear;
     Projectile arrow;
+    bool shooting {false};
 };

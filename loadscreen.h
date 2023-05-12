@@ -9,9 +9,7 @@ class Audio;
 class Loadscreen {
 public:
     Loadscreen(const std::string& filename, Graphics& graphics, Audio& audio);
-
     std::string filename;
-
     std::vector<std::pair<Sprite, int>> backgrounds;
 
 private:

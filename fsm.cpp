@@ -8,7 +8,6 @@
 ////////////
 //State
 ///////////
-
 std::unique_ptr<State> State::update(Player& player, Engine& engine, double dt){
     Physics old = player.physics;
     player.physics.update(dt);
@@ -35,11 +34,9 @@ std::unique_ptr<State> State::update(Player& player, Engine& engine, double dt){
     return nullptr;
 }
 
-
 ////////////
 // Standing
 ////////////
-
 bool on_platform(const Player& player, const Engine& engine) {
     constexpr double epsilon = 1e-2;
     Vec<double> left_foot{player.physics.position.x, player.physics.position.y - epsilon};
@@ -47,7 +44,7 @@ bool on_platform(const Player& player, const Engine& engine) {
     return engine.world->collides(left_foot) || engine.world->collides(right_foot);
 }
 
-std::unique_ptr<State> Standing::handle_input(Player& player, Engine& , const SDL_Event& event) {
+std::unique_ptr<State> Standing::handle_input(Player& player, Engine& engine, const SDL_Event& event) {
     if (event.type == SDL_KEYDOWN){
         SDL_Keycode key = event.key.keysym.sym;
         if (key == SDLK_SPACE || key == SDLK_UP){
@@ -59,18 +56,41 @@ std::unique_ptr<State> Standing::handle_input(Player& player, Engine& , const SD
         else if (key == SDLK_LEFT || key == SDLK_a){
             return std::make_unique<Running>(-player.walk_acceleration);
         }
-        else if (key == SDLK_x){
+        else if (key == SDLK_c){
             return std::make_unique<Shooting>();
         }
-        else if (key == SDLK_f){
+        else if (key == SDLK_v){
             return std::make_unique<Swinging>();
         }
         else if (key == SDLK_q){
             return std::make_unique<AttackAll>();
         }
+        else if (key == SDLK_z){
+            if (player.combat.health < player.combat.max_health && player.combat.potions>0){
+                engine.audio.play_sound("potion");
+                player.combat.health += 1;
+                player.combat.potions -= 1;
+                player.next_command = std::make_unique<Accelerate>(player.walk_acceleration);
+            }
+        
+        }
+        else if (key == SDLK_b){
+            return std::make_unique<Blocking>();
+        }
+        else if(key == SDLK_x){
+            if (player.combat.health < 4){
+                return std::make_unique<Stabbing>();
+            }
+
+        }
+        else if(key == SDLK_LSHIFT){
+            player.mutate(engine);
+            player.standing.get_sprite();
+        }
     }
     return nullptr;
 }
+
 std::unique_ptr<State> Standing::update(Player& player, Engine& engine, double dt){
     State::update(player,engine,dt);
     player.physics.velocity.x *= damping; // Physics::damp()
@@ -89,11 +109,9 @@ void Standing::enter(Player& player,Engine&){
     player.standing.flip(player.sprite.flip);
 }
 
-
 ///////////
 // Jumping
 ///////////
-
 Jumping::Jumping(double velocity)
     :velocity{velocity}{}
 
@@ -110,9 +128,6 @@ std::unique_ptr<State> Jumping::handle_input(Player& player, Engine&, const SDL_
             player.physics.velocity.x = 2;
         }
     }
-    // reduced movement in left / right directions
-    // Boosted jump by holding spacebar space -> add a small vy
-    // down -> drop faster
     return nullptr;
 }
 
@@ -150,7 +165,6 @@ void Jumping::exit(Player& player,Engine&){
 ////////////
 // Running
 ////////////
-
 Running::Running(double acceleration)
     :acceleration{acceleration}{}
 
@@ -166,10 +180,7 @@ std::unique_ptr<State> Running::handle_input(Player& player, Engine&, const SDL_
         else if (key == SDLK_SPACE || key == SDLK_UP){
             return std::make_unique<Jumping>(player.jump_velocity);
         }
-        else if (key == SDLK_x){
-            return std::make_unique<Shooting>();
-        }
-        else if (key == SDLK_c){
+        else if (key == SDLK_b){
             return std::make_unique<Sliding>(player.slide_velocity);
         }
     }
@@ -181,12 +192,9 @@ std::unique_ptr<State> Running::handle_input(Player& player, Engine&, const SDL_
 
 std::unique_ptr<State> Running::update(Player& player, Engine& engine, double dt){
     State::update(player,engine,dt);
-
     player.physics.velocity.x *= damping; // Physics::damp()
     player.running.update(dt);
     player.sprite = player.running.get_sprite();
-
-
     if (player.physics.acceleration.x == 0){
         return std::make_unique<Standing>();
     }    
@@ -205,148 +213,9 @@ void Running::exit(Player& player,Engine&){
     player.physics.acceleration.x = 0;
 }
 
-// ////////////
-// // Shooting
-// ////////////
-
-std::unique_ptr<State> Shooting::handle_input(Player& player, Engine&, const SDL_Event& event) {
-    if (event.type == SDL_KEYDOWN){
-        SDL_Keycode key = event.key.keysym.sym;
-        if (key == SDLK_SPACE || key == SDLK_UP){
-            return std::make_unique<Jumping>(player.jump_velocity);
-        }
-        if (key == SDLK_RIGHT || key == SDLK_d){
-            return std::make_unique<Running>(player.walk_acceleration);
-        }
-        if (key == SDLK_LEFT || key == SDLK_a){
-            return std::make_unique<Running>(-player.walk_acceleration);
-        }
-        if (key == SDLK_f){
-            return std::make_unique<Shooting>();
-        }
-    }
-    else if (event.type == SDL_KEYUP){
-        return std::make_unique<Standing>();
-    }
-    return nullptr;
-}
-
-std::unique_ptr<State> Shooting::update(Player& player, Engine& engine, double dt){
-    State::update(player,engine,dt);
-    if (shot == false){
-        Vec<double> position {player.physics.position.x+player.size.x, player.physics.position.y+(player.size.y/1.5)};
-        Vec<double> velocity {15,2};
-        velocity.x += randint(-1,1);
-        velocity.y += randint(-1,1);
-        if (player.sprite.flip){
-            position = {player.physics.position.x, player.physics.position.y+player.size.y};
-            velocity.x *= -1;
-            player.bow.shift.x = -20;
-            player.bow.flip = true;
-            player.bow.angle = 20;
-        }
-        player.next_command = std::make_unique<FireProjectile>(player.arrow,position,velocity);
-        engine.audio.play_sound("shooting");
-        shot = true;
-    }
-    
-
-    return nullptr;
-}
-void Shooting::exit(Player& player,Engine& engine){
-    shot = false;
-    player.bow = engine.graphics.get_sprite("none");
-}
-
-void Shooting::enter(Player& player,Engine& engine){
-    player.bow = engine.graphics.get_sprite("bow");
-    player.bow.angle = 350;
-    if (player.sprite.flip){
-        player.bow.shift.x = 0;
-        player.bow.shift.y -= 5;
-    }
-    else{
-        player.bow.shift.x += 10;
-        player.bow.shift.y -= 6;
-    }
-    
-    engine.audio.play_sound("drawing");
-}
-
-// ////////////
-// // Swinging
-// ////////////
-
-std::unique_ptr<State> Swinging::handle_input(Player& player, Engine&, const SDL_Event& event) {
-    if (event.type == SDL_KEYDOWN){
-        SDL_Keycode key = event.key.keysym.sym;
-        if (key == SDLK_SPACE || key == SDLK_UP){
-            return std::make_unique<Jumping>(player.jump_velocity);
-        }
-        if (key == SDLK_RIGHT || key == SDLK_d){
-            return std::make_unique<Running>(player.walk_acceleration);
-        }
-        if (key == SDLK_LEFT || key == SDLK_a){
-            return std::make_unique<Running>(-player.walk_acceleration);
-        }
-        if (key == SDLK_f){
-            return std::make_unique<Swinging>();
-        }
-    }
-    else if (event.type == SDL_KEYUP){
-        return std::make_unique<Standing>();
-    }
-    return nullptr;
-}
-
-std::unique_ptr<State> Swinging::update(Player& player, Engine& engine, double dt){
-    State::update(player,engine,dt);
-    if (distance < 50){
-        if (player.sprite.flip){
-            player.sword.sprite.flip = true;
-            player.sword.sprite.shift.x = -25;
-            player.sword.sprite.angle -= 10;
-            player.sword.sprite.shift.y += .05;
-        }
-        else{
-            player.sword.sprite.flip = false;
-            player.sword.sprite.angle += 10;
-            player.sword.sprite.shift.y += .05;
-        }
-        distance += 5;
-    }
-
-    AABB player_box{player.physics.position, {2.0*player.size.x, 1.0*player.size.y}};
-    std::vector<Object*> enemies = engine.world->quadtree.query_range(player_box);
-    if (enemies.size() > 0){
-        auto enemy = enemies.front();
-        player.combat.attack(*enemy);
-    }
-    return nullptr;
-}
-void Swinging::exit(Player& player,Engine& engine){
-    player.sword.sprite = engine.graphics.get_sprite("none");
-    engine.audio.play_sound("swinging");
-    distance = 0;
-}
-
-void Swinging::enter(Player& player,Engine& engine){
-    player.sword.sprite = engine.graphics.get_sprite("sword");
-    if (player.sprite.flip){
-        player.sword.sprite.shift.x = -10;
-        player.sword.sprite.angle = 340;
-    }
-    else{
-        player.sword.sprite.shift.x = 15;
-        player.sword.sprite.angle = 10;
-    }
-    player.sword.sprite.shift.y -= 2;
-}
-
 //////////
 // Sliding 
 //////////
-
 Sliding::Sliding(double speed)
     :speed{speed}{}
 
@@ -356,16 +225,13 @@ std::unique_ptr<State> Sliding::handle_input(Player& player, Engine&, const SDL_
         if (key == SDLK_SPACE || key == SDLK_UP){
             return std::make_unique<Jumping>(player.jump_velocity);
         }
-        if (key == SDLK_x){
-            return std::make_unique<Shooting>();
-        }
     }
     else if (event.type == SDL_KEYUP){
         player.physics.acceleration.x = 0;
     }
-
     return nullptr;
 }
+
 void Sliding::enter(Player& player,Engine&){
     if (player.physics.velocity.x < 0){
         player.next_command = std::make_unique<Slide>(-(speed*4));    
@@ -378,6 +244,7 @@ void Sliding::enter(Player& player,Engine&){
 void Sliding::exit(Player& player,Engine&){
     player.physics.acceleration.x = 0;
 }
+
 std::unique_ptr<State> Sliding::update(Player& player, Engine& engine, double dt){
     State::update(player,engine,dt);
     player.physics.velocity.x *= damping;
@@ -387,11 +254,9 @@ std::unique_ptr<State> Sliding::update(Player& player, Engine& engine, double dt
     return nullptr;
 }
 
-
 /////////////
 // Falling 
 ////////////
-
 Falling::Falling(double speed)
     :speed{speed}{}
 
@@ -425,6 +290,7 @@ std::unique_ptr<State> Falling::update(Player& player, Engine& engine, double dt
     }
     return nullptr;
 }
+
 void Falling::enter(Player& player,Engine& engine) {
     engine.audio.play_sound("falling");
     player.next_command = std::make_unique<Fall>(speed);
@@ -435,7 +301,6 @@ void Falling::enter(Player& player,Engine& engine) {
 /////////////
 // Attack All 
 ////////////
-
 std::unique_ptr<State> AttackAll::handle_input(Player&, Engine&, const SDL_Event& event) {
     if (event.type == SDL_KEYUP){
         SDL_Keycode key = event.key.keysym.sym;
@@ -445,6 +310,7 @@ std::unique_ptr<State> AttackAll::handle_input(Player&, Engine&, const SDL_Event
     }
     return nullptr;
 }
+
 void AttackAll::enter(Player& player,Engine& engine) {
     for (auto enemy : engine.world->enemies){
         player.combat.attack(*enemy);
@@ -454,7 +320,6 @@ void AttackAll::enter(Player& player,Engine& engine) {
 /////////////
 // Hurting
 ////////////
-
 std::unique_ptr<State> Hurting::handle_input(Player& player, Engine&, const SDL_Event& event) {
     if (event.type == SDL_KEYUP){
     SDL_Keycode key = event.key.keysym.sym;
@@ -476,6 +341,7 @@ std::unique_ptr<State> Hurting::handle_input(Player& player, Engine&, const SDL_
     }
 return nullptr;
 }
+
 std::unique_ptr<State> Hurting::update(Player& player, Engine& engine, double dt) {
     elapsed_time += dt;
     if (elapsed_time >= cooldown){
@@ -490,7 +356,261 @@ std::unique_ptr<State> Hurting::update(Player& player, Engine& engine, double dt
     elapsed_time = 0;
     player.combat.invincible = true;
 
- }
- void Hurting::exit(Player& player,Engine&) {
+}
+void Hurting::exit(Player& player,Engine&) {
     player.combat.invincible = false;
- }
+}
+
+/////////////
+// Blocking
+////////////
+std::unique_ptr<State> Blocking::handle_input(Player& player, Engine&, const SDL_Event& event){
+    if (event.type == SDL_KEYDOWN){
+        SDL_Keycode key = event.key.keysym.sym;
+        if (key == SDLK_SPACE || key == SDLK_UP){
+            return std::make_unique<Jumping>(player.jump_velocity);
+        }
+        else if (key == SDLK_RIGHT || key == SDLK_d){
+            return std::make_unique<Running>(player.walk_acceleration/2);
+        }
+        else if (key == SDLK_LEFT || key == SDLK_a){
+            return std::make_unique<Running>(-player.walk_acceleration/2);
+        }
+    }
+    else if (event.type == SDL_KEYUP){
+        return std::make_unique<Standing>();
+    }
+    return nullptr;
+}
+
+std::unique_ptr<State> Blocking::update(Player& player, Engine& engine, double dt){
+    State::update(player,engine,dt);
+    return nullptr;
+
+}
+
+void Blocking::enter(Player& player,Engine& engine){
+    player.physics.velocity.x = 0;
+    player.combat.invincible = true;
+    player.shield = engine.graphics.get_sprite("shield");
+    player.shield.angle = 350;
+    if (player.sprite.flip){
+        player.shield.shift.x = -20;
+        player.shield.shift.y -= 2;
+    }
+    else{
+        player.shield.shift.x += 10;
+        player.shield.shift.y -= 2;
+    }
+
+}
+
+void Blocking::exit(Player& player,Engine& engine){
+    player.shield = engine.graphics.get_sprite("none");
+    player.combat.invincible = false;
+}
+
+////////////
+// Shooting
+////////////
+std::unique_ptr<State> Shooting::handle_input(Player& player, Engine&, const SDL_Event& event) {
+    if (event.type == SDL_KEYDOWN){
+        SDL_Keycode key = event.key.keysym.sym;
+        if (key == SDLK_SPACE || key == SDLK_UP){
+            return std::make_unique<Jumping>(player.jump_velocity);
+        }
+        if (key == SDLK_RIGHT || key == SDLK_d){
+            return std::make_unique<Running>(player.walk_acceleration);
+        }
+        if (key == SDLK_LEFT || key == SDLK_a){
+            return std::make_unique<Running>(-player.walk_acceleration);
+        }
+        if (key == SDLK_c){
+            return std::make_unique<Shooting>();
+        }
+    }
+    else if (event.type == SDL_KEYUP){
+        SDL_Keycode key = event.key.keysym.sym;
+        if (key == SDLK_c){
+            player.shooting = false;
+            return std::make_unique<Standing>();
+        }
+    }
+    return nullptr;
+}
+
+std::unique_ptr<State> Shooting::update(Player& player, Engine& engine, double dt){
+    State::update(player,engine,dt);    
+    if (player.shooting == false){
+        player.shooting = true;
+        Vec<double> position {player.physics.position.x+player.size.x, player.physics.position.y+(player.size.y/1.5)};
+        Vec<double> velocity {15,2};
+        velocity.x += randint(-3,3);
+        velocity.y += randint(-3,3);
+        if (player.sprite.flip){
+            position = {player.physics.position.x, player.physics.position.y+player.size.y};
+            velocity.x *= -1;
+            player.bow.shift.x = -20;
+            player.bow.flip = true;
+            player.bow.angle = 20;
+        }
+        player.next_command = std::make_unique<FireProjectile>(player.arrow,position,velocity);
+        shots += 1;
+        return nullptr;
+    }
+    return nullptr;
+}
+void Shooting::exit(Player& player,Engine& engine){
+    engine.audio.play_sound("shooting");
+    player.bow = engine.graphics.get_sprite("none");
+}
+
+void Shooting::enter(Player& player,Engine& engine){
+    shots = 0;
+    engine.audio.play_sound("drawing");
+    player.bow = engine.graphics.get_sprite("bow");
+    player.physics.velocity.x = 0;
+    player.bow.angle = 350;
+    if (player.sprite.flip){
+        player.bow.shift.x = 0;
+        player.bow.shift.y -= 5;
+    }
+    else{
+        player.bow.shift.x += 10;
+        player.bow.shift.y -= 6;
+    }
+}
+
+////////////
+// Swinging
+////////////
+std::unique_ptr<State> Swinging::handle_input(Player& player, Engine&, const SDL_Event& event) {
+    if (event.type == SDL_KEYDOWN){
+        SDL_Keycode key = event.key.keysym.sym;
+        if (key == SDLK_SPACE || key == SDLK_UP){
+            return std::make_unique<Jumping>(player.jump_velocity);
+        }
+        if (key == SDLK_RIGHT || key == SDLK_d){
+            return std::make_unique<Running>(player.walk_acceleration);
+        }
+        if (key == SDLK_LEFT || key == SDLK_a){
+            return std::make_unique<Running>(-player.walk_acceleration);
+        }
+        if (key == SDLK_v){
+            return std::make_unique<Swinging>();
+        }
+    }
+    else if (event.type == SDL_KEYUP){
+        return std::make_unique<Standing>();
+    }
+    return nullptr;
+}
+
+std::unique_ptr<State> Swinging::update(Player& player, Engine& engine, double dt){
+    State::update(player,engine,dt);
+    if (distance < 50){
+        if (player.sprite.flip){
+            player.sword.sprite.flip = true;
+            player.sword.sprite.shift.x = -25;
+            player.sword.sprite.angle -= 10;
+            player.sword.sprite.shift.y += .05;
+        }
+        else{
+            player.sword.sprite.flip = false;
+            player.sword.sprite.angle += 10;
+            player.sword.sprite.shift.y += .05;
+        }
+        distance += 5;
+    }
+    AABB player_box{player.physics.position, {2.0*player.size.x, 1.0*player.size.y}};
+    std::vector<Object*> enemies = engine.world->quadtree.query_range(player_box);
+    if (enemies.size() > 0){
+        auto enemy = enemies.front();
+        player.combat.attack(*enemy);
+    }
+    return nullptr;
+}
+
+void Swinging::exit(Player& player,Engine& engine){
+    player.sword.sprite = engine.graphics.get_sprite("none");
+    engine.audio.play_sound("swinging");
+    distance = 0;
+}
+
+void Swinging::enter(Player& player,Engine& engine){
+    player.sword.sprite = engine.graphics.get_sprite("sword");
+    if (player.sprite.flip){
+        player.sword.sprite.shift.x = -10;
+        player.sword.sprite.angle = 340;
+    }
+    else{
+        player.sword.sprite.shift.x = 10;
+        player.sword.sprite.angle = 10;
+    }
+    player.sword.sprite.shift.y -= 2;
+}
+
+////////////
+// Stabbing
+////////////
+std::unique_ptr<State> Stabbing::handle_input(Player& player, Engine&, const SDL_Event& event) {
+    if (event.type == SDL_KEYDOWN){
+        SDL_Keycode key = event.key.keysym.sym;
+        if (key == SDLK_SPACE || key == SDLK_UP){
+            return std::make_unique<Jumping>(player.jump_velocity);
+        }
+        if (key == SDLK_RIGHT || key == SDLK_d){
+            return std::make_unique<Running>(player.walk_acceleration);
+        }
+        if (key == SDLK_LEFT || key == SDLK_a){
+            return std::make_unique<Running>(-player.walk_acceleration);
+        }
+        if (key == SDLK_v){
+            return std::make_unique<Swinging>();
+        }
+    }
+    else if (event.type == SDL_KEYUP){
+        return std::make_unique<Standing>();
+    }
+    return nullptr;
+}
+
+std::unique_ptr<State> Stabbing::update(Player& player, Engine& engine, double dt){
+    State::update(player,engine,dt);
+    if (distance < 50){
+        if (player.sprite.flip){
+            player.spear.sprite.flip = true;
+            player.spear.sprite.angle = 270;
+            player.spear.sprite.shift.x = -20;
+            player.spear.sprite.shift.y = -35;
+        }
+        else{
+            player.spear.sprite.flip = false;
+            player.spear.sprite.shift.y = -35;
+            player.spear.sprite.shift.x += .1;
+        }
+        distance += 5;
+    }
+
+    AABB player_box{player.physics.position, {3.0*player.size.x, 1.0*player.size.y}};
+    std::vector<Object*> enemies = engine.world->quadtree.query_range(player_box);
+    if (enemies.size() > 0){
+        auto enemy = enemies.front();
+        player.combat.attack(*enemy);
+    }
+    return nullptr;
+}
+
+void Stabbing::exit(Player& player,Engine& engine){
+    player.spear.sprite = engine.graphics.get_sprite("none");
+    engine.audio.play_sound("swinging");
+    distance = 0;
+}
+
+void Stabbing::enter(Player& player,Engine& engine){
+    std::cout << "Stabbing" << std::endl;
+    std::cout << player.combat.health << std::endl;
+    player.spear.sprite = engine.graphics.get_sprite("spear");
+    player.spear.sprite.angle = 90;
+    player.spear.sprite.shift.y = -35;
+}

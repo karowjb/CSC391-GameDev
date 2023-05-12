@@ -24,6 +24,7 @@ public:
 
 
     void render_life(int life, int max_life);
+    void render_potion(int potions, int max_potions);
 private:
     Graphics& graphics;
     int tilesize;

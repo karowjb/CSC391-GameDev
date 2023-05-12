@@ -79,6 +79,10 @@ class EndGame : public Command {
 public:
     void execute(Object&, Engine& engine) override;
 };
+class Victory : public Command {
+public:
+    void execute(Object&, Engine& engine) override;
+};
 
 class PlaySound : public Command{
 public: 
