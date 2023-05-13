@@ -36,7 +36,6 @@ private:
     double acceleration;
 };
 
-
 class Slide : public Command{
 public:
     Slide(double speed);
@@ -61,12 +60,6 @@ private:
     Projectile projectile;
 };
 
-// class SwingSword : public Command{
-// public:
-//     SwingSword(Object& object, Engine& engine, Player& player);
-//     void execute(Object& object, Engine& engine) override;
-// };
-
 class Fall : public Command {
 public:
     Fall(double speed);
@@ -79,6 +72,7 @@ class EndGame : public Command {
 public:
     void execute(Object&, Engine& engine) override;
 };
+
 class Victory : public Command {
 public:
     void execute(Object&, Engine& engine) override;

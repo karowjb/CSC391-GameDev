@@ -73,10 +73,9 @@ void Camera::render(const Object& object) const{
 void Camera::render(const Player& player) const{
     render(player.physics.position, player.sprite);
     if (player.sprite.flip){
-        // int bowPos = player.sprite.shift(player.size.x);
         render(player.physics.position, player.bow);
     }
-    // player.bow.flip = true;
+    // Rendering weapons for player
     render(player.physics.position, player.bow);
     render(player.physics.position, player.shield);
     render(player.physics.position, player.sword.sprite);
@@ -89,6 +88,7 @@ void Camera::render(const std::vector<std::pair<Sprite, int>>& backgrounds) cons
         graphics.draw_sprite({-shift, 0}, sprite);
     }
 }
+// Health bar
 void Camera::render_life(int life, int max_life){
     Sprite heart = graphics.get_sprite("heart");
     Sprite empty_heart = graphics.get_sprite("empty_heart");
@@ -104,6 +104,7 @@ void Camera::render_life(int life, int max_life){
     }
 }
 
+//Potions bar
 void Camera::render_potion(int potions, int max_potions){
     Sprite potion = graphics.get_sprite("potion_full");
     Sprite empty_potion = graphics.get_sprite("potion_empty");

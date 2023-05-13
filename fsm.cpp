@@ -444,7 +444,7 @@ std::unique_ptr<State> Shooting::update(Player& player, Engine& engine, double d
     if (player.shooting == false){
         player.shooting = true;
         Vec<double> position {player.physics.position.x+player.size.x, player.physics.position.y+(player.size.y/1.5)};
-        Vec<double> velocity {15,2};
+        Vec<double> velocity {20,3};
         velocity.x += randint(-3,3);
         velocity.y += randint(-3,3);
         if (player.sprite.flip){
@@ -452,7 +452,7 @@ std::unique_ptr<State> Shooting::update(Player& player, Engine& engine, double d
             velocity.x *= -1;
             player.bow.shift.x = -20;
             player.bow.flip = true;
-            player.bow.angle = 20;
+            player.bow.angle = 340;
         }
         player.next_command = std::make_unique<FireProjectile>(player.arrow,position,velocity);
         shots += 1;
@@ -470,7 +470,7 @@ void Shooting::enter(Player& player,Engine& engine){
     engine.audio.play_sound("drawing");
     player.bow = engine.graphics.get_sprite("bow");
     player.physics.velocity.x = 0;
-    player.bow.angle = 350;
+    player.bow.angle = 20;
     if (player.sprite.flip){
         player.bow.shift.x = 0;
         player.bow.shift.y -= 5;
@@ -511,14 +511,12 @@ std::unique_ptr<State> Swinging::update(Player& player, Engine& engine, double d
     if (distance < 50){
         if (player.sprite.flip){
             player.sword.sprite.flip = true;
-            player.sword.sprite.shift.x = -25;
-            player.sword.sprite.angle -= 10;
-            player.sword.sprite.shift.y += .05;
+            player.sword.sprite.shift.x = -30;
+            player.sword.sprite.angle -= 5;
         }
         else{
             player.sword.sprite.flip = false;
-            player.sword.sprite.angle += 10;
-            player.sword.sprite.shift.y += .05;
+            player.sword.sprite.angle += 5;
         }
         distance += 5;
     }
@@ -541,13 +539,14 @@ void Swinging::enter(Player& player,Engine& engine){
     player.sword.sprite = engine.graphics.get_sprite("sword");
     if (player.sprite.flip){
         player.sword.sprite.shift.x = -10;
-        player.sword.sprite.angle = 340;
+        player.sword.sprite.angle = 10;
+        player.sword.sprite.shift.y = -30;
     }
     else{
-        player.sword.sprite.shift.x = 10;
-        player.sword.sprite.angle = 10;
+        player.sword.sprite.shift.x = 3;
+        player.sword.sprite.angle = 355;
     }
-    player.sword.sprite.shift.y -= 2;
+    // player.sword.sprite.shift.y -= 2;
 }
 
 ////////////
@@ -608,8 +607,6 @@ void Stabbing::exit(Player& player,Engine& engine){
 }
 
 void Stabbing::enter(Player& player,Engine& engine){
-    std::cout << "Stabbing" << std::endl;
-    std::cout << player.combat.health << std::endl;
     player.spear.sprite = engine.graphics.get_sprite("spear");
     player.spear.sprite.angle = 90;
     player.spear.sprite.shift.y = -35;

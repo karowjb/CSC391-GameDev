@@ -35,6 +35,8 @@ std::unique_ptr<Command> hurting(Engine&, Enemy&){
     return std::make_unique<Stop>();
 }
 
+
+// Creating enemy types 
 EnemyType create_troll(Graphics& graphics){
     Vec<double> acceleration {-15,gravity};
     AnimatedSprite sprite = graphics.get_animated_sprite("orc_running",0.15, true, false);

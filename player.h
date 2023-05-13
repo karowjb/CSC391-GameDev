@@ -11,7 +11,6 @@
 #include "sprite.h"
 #include "object.h"
 #include "projectile.h"
-// forward declaration
 class World;
 class Player : public Object {
 public:

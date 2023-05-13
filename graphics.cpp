@@ -21,7 +21,6 @@ Graphics::Graphics(const std::string &title, int window_width, int window_height
     renderer = SDL_CreateRenderer(window,-1,SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
     // initialize SDL, create a window and renderer
-    // make sure to check all return values and throw exceptions when errors occur
     //SDL Image
     int img_flags = IMG_INIT_PNG;
     if (!(IMG_Init(img_flags) & img_flags)){
@@ -31,7 +30,6 @@ Graphics::Graphics(const std::string &title, int window_width, int window_height
 
 Graphics::~Graphics() {
     IMG_Quit();
-    // clean up: release SDL resources
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     SDL_Quit();

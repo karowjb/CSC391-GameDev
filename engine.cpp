@@ -25,6 +25,7 @@ void Engine::load_level(const std::string& level_filename) {
     camera.move_to(player->physics.position);
 }
 
+// Death end screen
 void Engine::setup_death_screen() {
     running = true;
     Loadscreen game_over{"assets/game-over.txt", graphics, audio};
@@ -32,6 +33,8 @@ void Engine::setup_death_screen() {
 
     world->backgrounds = game_over.backgrounds;
 }
+
+// Victory end screen
 void Engine::setup_victory_screen() {
     running = true;
     Loadscreen game_over{"assets/victory.txt", graphics, audio};
@@ -119,6 +122,7 @@ void Engine::render() {
     graphics.clear();
     camera.render(world->backgrounds);
     camera.render(world->tilemap);
+    // Render bars
     camera.render_potion(player->combat.potions, player->combat.max_potions);
     camera.render_life(player->combat.health, player->combat.max_health);
     camera.render(*player);
@@ -144,8 +148,6 @@ void Engine::run(){
         std::chrono::duration<double> elapsed = current - previous;
         previous = current;
         lag += elapsed.count();
-
-
         constexpr double dt = 1.0/60.0;
         input();
         while (lag >= dt){
@@ -155,6 +157,7 @@ void Engine::run(){
         }
         render();
     }
+    // After quit checking which screen to render
     if (victory){
         setup_victory_screen();
     }

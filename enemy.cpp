@@ -59,9 +59,10 @@ std::unique_ptr<Command> Enemy::update(Engine& engine, double dt){
     return nullptr;
 }
 
-    std::unique_ptr<Command> Enemy::next_action(Engine& engine){
-        if (combat.invincible){
-            return hurting(engine, *this);
-        }
-        return type.behavior(engine, *this);
+// Putting enemy into hurting state
+std::unique_ptr<Command> Enemy::next_action(Engine& engine){
+    if (combat.invincible){
+        return hurting(engine, *this);
     }
+    return type.behavior(engine, *this);
+}

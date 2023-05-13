@@ -15,7 +15,6 @@ void Level::load(Graphics& graphics, Audio& audio){
     if (!input) {
         throw std::runtime_error("can't open " + filename);
     }
-    // error if can't open file
 
     //load level's theme
     std::string theme_filename;
@@ -33,7 +32,6 @@ void Level::load(Graphics& graphics, Audio& audio){
     // set level dimensions
     height = lines.size();
     width = lines.front().size();
-    // error handling!
     for (int y = 0; y < height; ++y){
         for (int x = 0; x < width; ++x){
             char symbol = lines.at(y).at(x);
@@ -58,7 +56,7 @@ void Level::load(Graphics& graphics, Audio& audio){
                 enemies.push_back({position,type});
             }
             else {
-                //error
+                // std::cout << "Error in level.cpp" << std::endl;
             }
 
         }

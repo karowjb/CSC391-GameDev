@@ -13,17 +13,21 @@ Player::Player(Engine& engine, const Vec<double>& position, const Vec<int>& size
         combat.potions = 3;
         state = std::make_unique<Standing>();
         state->enter(*this,engine);
+        // getting the default sprite
         standing = engine.graphics.get_animated_sprite("knight_standing",0.15,false,false);
         jumping = engine.graphics.get_animated_sprite("knight_jumping",0.15,false,false);
         running = engine.graphics.get_animated_sprite("knight_running",0.05,false,false);
         falling = engine.graphics.get_animated_sprite("knight_falling",0.15,false,false);
 
         sprite = standing.get_sprite();
+        // Setting the combat sprites
         arrow.sprite = engine.graphics.get_sprite("arrow");
         bow = engine.graphics.get_sprite("none");
         shield = engine.graphics.get_sprite("none");
         sword.sprite = engine.graphics.get_sprite("none");
         spear.sprite = engine.graphics.get_sprite("none");
+        // Setting attack damages
+        spear.combat.attack_damage = 4;
         arrow.combat.invincible = true;
         arrow.combat.attack_damage = 2;
         sword.combat.attack_damage = 1;
@@ -61,6 +65,7 @@ std::pair<Vec<double>, Color> Player::get_sprite() const {
     return {physics.position, color};
 }
 
+// Change the current sprite
 void Player::mutate(Engine& engine){
     standing = engine.graphics.get_animated_sprite("ninja_standing",0.15,false,false);
     jumping = engine.graphics.get_animated_sprite("ninja_jumping",0.15,false,false);
