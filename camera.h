@@ -21,8 +21,7 @@ public:
     void render( const Vec<double>& position, const Sprite& sprite) const;
     void render(const Object& object) const;
     void render(const Player& player) const;
-
-
+    // Life and potions bars
     void render_life(int life, int max_life);
     void render_potion(int potions, int max_potions);
 private:

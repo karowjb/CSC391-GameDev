@@ -28,6 +28,7 @@ public:
     const double jump_velocity = 10.0;
     std::unique_ptr<State>state;
     std::unique_ptr<Command> next_command;
+    // Player weapons
     Sprite bow;
     Sprite shield;
     Sword sword;

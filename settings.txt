@@ -2,4 +2,4 @@ title KnightNight
 screen_width 1280
 screen_height 720
 tilesize 64
-starting_level assets/levels/level-01.txt
+starting_level assets/levels/level-00.txt
